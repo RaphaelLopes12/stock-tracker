@@ -1,0 +1,67 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: stock-tracker-db
+    environment:
+      POSTGRES_USER: stocktracker
+      POSTGRES_PASSWORD: stocktracker
+      POSTGRES_DB: stock_tracker
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U stocktracker -d stock_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: stock-tracker-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: stock-tracker-backend
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://stocktracker:stocktracker@db:5432/stock_tracker
+      REDIS_URL: redis://redis:6379/0
+      APP_ENV: development
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    container_name: stock-tracker-frontend
+    depends_on:
+      - backend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    command: npm run dev -- --host
+
+volumes:
+  postgres_data:
