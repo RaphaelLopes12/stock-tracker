@@ -14,13 +14,17 @@ async def lifespan(app: FastAPI):
     # Startup
     print(f"Starting {settings.app_name}...")
 
-    # Seed stocks
-    async with async_session_maker() as db:
-        count = await seed_stocks(db)
-        if count > 0:
-            print(f"Seeded {count} stocks from B3")
-        else:
-            print("Stocks already seeded")
+    # Seed stocks (skip if tables don't exist yet - migrations may not have run)
+    try:
+        async with async_session_maker() as db:
+            count = await seed_stocks(db)
+            if count > 0:
+                print(f"Seeded {count} stocks from B3")
+            else:
+                print("Stocks already seeded")
+    except Exception as e:
+        print(f"Warning: Could not seed stocks (tables may not exist yet): {e}")
+        print("Run 'alembic upgrade head' to create tables")
 
     yield
     # Shutdown

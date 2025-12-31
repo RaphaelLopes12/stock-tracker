@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
 echo "=== Starting Stock Tracker Backend ==="
-echo "Database URL: ${DATABASE_URL:0:30}..."
+echo "Database URL configured: yes"
 
 echo "=== Running Alembic migrations ==="
 python -m alembic upgrade head
