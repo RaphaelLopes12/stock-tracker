@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e
+
+echo "=== Starting Stock Tracker Backend ==="
+echo "Database URL: ${DATABASE_URL:0:30}..."
+
+echo "=== Running Alembic migrations ==="
+python -m alembic upgrade head
+
+echo "=== Migrations completed successfully ==="
+echo "=== Starting Uvicorn server ==="
+exec uvicorn app.main:app --host 0.0.0.0 --port 8000
