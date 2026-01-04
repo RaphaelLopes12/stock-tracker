@@ -63,14 +63,23 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# CORS - permitir frontend local
+# CORS - permitir frontend local e produção
+cors_origins = [
+    "http://localhost:5173",  # Vite dev server
+    "http://localhost:4173",  # Vite preview
+    "http://localhost:3000",
+]
+
+# Em produção, permitir qualquer subdomínio do Vercel
+if settings.app_env == "production":
+    cors_origins.extend([
+        "https://*.vercel.app",
+        "https://stock-tracker-frontend.vercel.app",  # Ajuste conforme seu domínio
+    ])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",  # Vite dev server
-        "http://localhost:4173",  # Vite preview
-        "http://localhost:3000",
-    ],
+    allow_origins=["*"] if settings.app_env == "production" else cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
