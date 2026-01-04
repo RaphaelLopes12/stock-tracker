@@ -1,3 +1,5 @@
+import subprocess
+import sys
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -9,12 +11,36 @@ from app.core.database import async_session_maker
 from app.services.seed import seed_stocks
 
 
+def run_migrations():
+    """Run alembic migrations before app starts."""
+    print("Running database migrations...")
+    try:
+        result = subprocess.run(
+            [sys.executable, "-m", "alembic", "upgrade", "head"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        print(f"Migration output: {result.stdout}")
+        if result.stderr:
+            print(f"Migration stderr: {result.stderr}")
+        print("Migrations completed successfully!")
+    except subprocess.CalledProcessError as e:
+        print(f"Migration failed with code {e.returncode}")
+        print(f"stdout: {e.stdout}")
+        print(f"stderr: {e.stderr}")
+        raise
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
     print(f"Starting {settings.app_name}...")
 
-    # Seed stocks (skip if tables don't exist yet - migrations may not have run)
+    # Run migrations first
+    run_migrations()
+
+    # Seed stocks
     try:
         async with async_session_maker() as db:
             count = await seed_stocks(db)
@@ -23,8 +49,7 @@ async def lifespan(app: FastAPI):
             else:
                 print("Stocks already seeded")
     except Exception as e:
-        print(f"Warning: Could not seed stocks (tables may not exist yet): {e}")
-        print("Run 'alembic upgrade head' to create tables")
+        print(f"Warning: Could not seed stocks: {e}")
 
     yield
     # Shutdown
