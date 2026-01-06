@@ -18,8 +18,8 @@ function getDefaultLocale(): string {
   return 'en'
 }
 
-const i18n = createI18n<[MessageSchema], 'pt-BR' | 'en' | 'es'>({
-  legacy: false, // Composition API
+const i18n = createI18n({
+  legacy: false,
   locale: getDefaultLocale(),
   fallbackLocale: 'pt-BR',
   messages: {
@@ -30,13 +30,13 @@ const i18n = createI18n<[MessageSchema], 'pt-BR' | 'en' | 'es'>({
 })
 
 export function setLocale(locale: 'pt-BR' | 'en' | 'es') {
-  i18n.global.locale.value = locale
+  (i18n.global.locale as unknown as { value: string }).value = locale
   localStorage.setItem('locale', locale)
   document.documentElement.lang = locale === 'pt-BR' ? 'pt-BR' : locale
 }
 
-export function getLocale() {
-  return i18n.global.locale.value
+export function getLocale(): 'pt-BR' | 'en' | 'es' {
+  return (i18n.global.locale as unknown as { value: string }).value as 'pt-BR' | 'en' | 'es'
 }
 
 export default i18n

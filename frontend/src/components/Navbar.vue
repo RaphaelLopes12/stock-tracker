@@ -31,6 +31,10 @@ function changeLanguage(locale: 'pt-BR' | 'en' | 'es') {
 function getCurrentFlag() {
   return languages.find(l => l.code === currentLocale.value)?.flag || '🌐'
 }
+
+function handleBlur() {
+  window.setTimeout(() => { showLangMenu.value = false }, 150)
+}
 </script>
 
 <template>
@@ -56,7 +60,7 @@ function getCurrentFlag() {
           <div class="relative">
             <button
               @click="showLangMenu = !showLangMenu"
-              @blur="setTimeout(() => showLangMenu = false, 150)"
+              @blur="handleBlur"
               class="flex items-center gap-1 text-gray-600 dark:text-gray-300 hover:text-primary-500 transition-colors px-2 py-1 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
               :title="t('language.select')"
             >
