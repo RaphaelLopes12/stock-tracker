@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePortfolioStore } from '@/stores/portfolio'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import ImportTransactionsModal from '@/components/ImportTransactionsModal.vue'
 
+const { t } = useI18n()
 const store = usePortfolioStore()
 
 const showAddModal = ref(false)
@@ -34,7 +36,7 @@ const formatQuantity = (qty: number) => {
   return new Intl.NumberFormat('pt-BR').format(qty)
 }
 
-// Classes dinâmicas para cores
+// Classes dinamicas para cores
 const gainLossClass = (value: number | null) => {
   if (value === null || value === undefined) return 'text-gray-400'
   if (value > 0) return 'text-emerald-400'
@@ -64,7 +66,7 @@ const toggleTransactions = () => {
 
 // Delete transaction with confirmation
 const deleteTransaction = async (id: number) => {
-  if (confirm('Tem certeza que deseja remover esta transação? O portfolio será recalculado.')) {
+  if (confirm(t('portfolio.confirmDeleteTransaction'))) {
     await store.deleteTransaction(id)
   }
 }
@@ -75,18 +77,18 @@ const deleteTransaction = async (id: number) => {
     <!-- Header -->
     <header class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Minha Carteira</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Acompanhe seus investimentos e rentabilidade</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ t('portfolio.title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ t('portfolio.subtitle') }}</p>
       </div>
       <div class="flex items-center gap-3">
         <button @click="showImportModal = true" class="btn btn-secondary flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
-          Importar CSV
+          {{ t('portfolio.importCsv') }}
         </button>
         <button @click="showAddModal = true" class="btn btn-primary">
-          + Nova Transação
+          {{ t('portfolio.newTransaction') }}
         </button>
       </div>
     </header>
@@ -97,7 +99,7 @@ const deleteTransaction = async (id: number) => {
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      Carregando carteira...
+      {{ t('portfolio.loadingPortfolio') }}
     </div>
 
     <!-- Empty State -->
@@ -105,16 +107,16 @@ const deleteTransaction = async (id: number) => {
       <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 mx-auto text-gray-600 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
       </svg>
-      <h3 class="text-lg font-medium text-gray-300 mb-2">Carteira vazia</h3>
+      <h3 class="text-lg font-medium text-gray-300 mb-2">{{ t('portfolio.emptyTitle') }}</h3>
       <p class="text-gray-500 mb-6 max-w-md mx-auto">
-        Registre sua primeira compra ou importe suas transações de um arquivo CSV.
+        {{ t('portfolio.emptyDescription') }}
       </p>
       <div class="flex items-center justify-center gap-3">
         <button @click="showImportModal = true" class="btn btn-secondary">
-          Importar CSV
+          {{ t('portfolio.importCsv') }}
         </button>
         <button @click="showAddModal = true" class="btn btn-primary">
-          Registrar compra
+          {{ t('portfolio.registerPurchase') }}
         </button>
       </div>
     </div>
@@ -131,7 +133,7 @@ const deleteTransaction = async (id: number) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             </div>
-            <p class="text-gray-400 text-sm">Total Investido</p>
+            <p class="text-gray-400 text-sm">{{ t('portfolio.totalInvested') }}</p>
           </div>
           <p class="text-2xl font-bold text-white">
             {{ formatCurrency(store.summary?.total_invested ?? 0) }}
@@ -146,14 +148,14 @@ const deleteTransaction = async (id: number) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <p class="text-gray-400 text-sm">Valor Atual</p>
+            <p class="text-gray-400 text-sm">{{ t('portfolio.currentValue') }}</p>
           </div>
           <p class="text-2xl font-bold text-white">
             {{ formatCurrency(store.summary?.current_value ?? 0) }}
           </p>
         </div>
 
-        <!-- Lucro/Prejuízo -->
+        <!-- Lucro/Prejuizo -->
         <div
           class="backdrop-blur-sm rounded-xl p-5 border"
           :class="(store.summary?.total_gain_loss ?? 0) >= 0
@@ -178,7 +180,7 @@ const deleteTransaction = async (id: number) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6" />
               </svg>
             </div>
-            <p class="text-gray-400 text-sm">Lucro/Prejuízo</p>
+            <p class="text-gray-400 text-sm">{{ t('portfolio.gainLoss') }}</p>
           </div>
           <p class="text-2xl font-bold" :class="gainLossClass(store.summary?.total_gain_loss ?? 0)">
             {{ formatCurrency(store.summary?.total_gain_loss ?? 0) }}
@@ -198,10 +200,9 @@ const deleteTransaction = async (id: number) => {
             </svg>
           </div>
           <div>
-            <h3 class="font-medium text-blue-400 mb-1">Dica para iniciantes</h3>
+            <h3 class="font-medium text-blue-400 mb-1">{{ t('portfolio.tipTitle') }}</h3>
             <p class="text-sm text-gray-400">
-              O preço médio é calculado automaticamente a cada compra. Quanto mais você comprar com preços baixos,
-              menor será seu preço médio e maior será seu lucro quando vender!
+              {{ t('portfolio.tipDescription') }}
             </p>
           </div>
         </div>
@@ -216,10 +217,10 @@ const deleteTransaction = async (id: number) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
               </svg>
             </div>
-            <h3 class="font-semibold text-white">Posições</h3>
+            <h3 class="font-semibold text-white">{{ t('portfolio.holdings') }}</h3>
           </div>
           <span class="text-xs px-2 py-1 rounded bg-gray-700 text-gray-300">
-            {{ store.holdings.length }} ativos
+            {{ t('portfolio.nAssets', { n: store.holdings.length }) }}
           </span>
         </div>
 
@@ -227,12 +228,12 @@ const deleteTransaction = async (id: number) => {
           <table class="w-full">
             <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase">
               <tr>
-                <th class="px-4 py-3 text-left">Ativo</th>
-                <th class="px-4 py-3 text-right">Qtd</th>
-                <th class="px-4 py-3 text-right hidden sm:table-cell">PM</th>
-                <th class="px-4 py-3 text-right hidden md:table-cell">Atual</th>
-                <th class="px-4 py-3 text-right">Valor</th>
-                <th class="px-4 py-3 text-right">Resultado</th>
+                <th class="px-4 py-3 text-left">{{ t('portfolio.asset') }}</th>
+                <th class="px-4 py-3 text-right">{{ t('portfolio.quantity') }}</th>
+                <th class="px-4 py-3 text-right hidden sm:table-cell">{{ t('portfolio.avgPrice') }}</th>
+                <th class="px-4 py-3 text-right hidden md:table-cell">{{ t('portfolio.currentPrice') }}</th>
+                <th class="px-4 py-3 text-right">{{ t('portfolio.totalValue') }}</th>
+                <th class="px-4 py-3 text-right">{{ t('portfolio.result') }}</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-700/50">
@@ -260,12 +261,12 @@ const deleteTransaction = async (id: number) => {
                   {{ formatQuantity(holding.quantity) }}
                 </td>
 
-                <!-- Preço Médio -->
+                <!-- Preco Medio -->
                 <td class="px-4 py-4 text-right text-gray-300 hidden sm:table-cell">
                   {{ formatCurrency(holding.average_price) }}
                 </td>
 
-                <!-- Preço Atual -->
+                <!-- Preco Atual -->
                 <td class="px-4 py-4 text-right hidden md:table-cell">
                   <span class="text-white">{{ formatCurrency(holding.current_price) }}</span>
                   <span
@@ -307,7 +308,7 @@ const deleteTransaction = async (id: number) => {
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
               </svg>
             </div>
-            <h3 class="font-semibold text-white">Histórico de Transações</h3>
+            <h3 class="font-semibold text-white">{{ t('portfolio.transactionHistory') }}</h3>
           </div>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -322,19 +323,19 @@ const deleteTransaction = async (id: number) => {
 
         <div v-if="showTransactions" class="border-t border-gray-700/50">
           <div v-if="store.transactions.length === 0" class="text-center py-8 text-gray-400">
-            Nenhuma transação registrada
+            {{ t('portfolio.noTransactions') }}
           </div>
 
           <div v-else class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase">
                 <tr>
-                  <th class="px-4 py-3 text-left">Data</th>
-                  <th class="px-4 py-3 text-left">Tipo</th>
-                  <th class="px-4 py-3 text-left">Ativo</th>
-                  <th class="px-4 py-3 text-right">Qtd</th>
-                  <th class="px-4 py-3 text-right hidden sm:table-cell">Preço</th>
-                  <th class="px-4 py-3 text-right">Total</th>
+                  <th class="px-4 py-3 text-left">{{ t('portfolio.date') }}</th>
+                  <th class="px-4 py-3 text-left">{{ t('portfolio.type') }}</th>
+                  <th class="px-4 py-3 text-left">{{ t('portfolio.asset') }}</th>
+                  <th class="px-4 py-3 text-right">{{ t('portfolio.quantity') }}</th>
+                  <th class="px-4 py-3 text-right hidden sm:table-cell">{{ t('portfolio.unitPrice') }}</th>
+                  <th class="px-4 py-3 text-right">{{ t('portfolio.total') }}</th>
                   <th class="px-4 py-3 text-right w-10"></th>
                 </tr>
               </thead>
@@ -352,7 +353,7 @@ const deleteTransaction = async (id: number) => {
                         ? 'bg-emerald-500/20 text-emerald-400'
                         : 'bg-red-500/20 text-red-400'"
                     >
-                      {{ trans.type === 'buy' ? 'Compra' : 'Venda' }}
+                      {{ trans.type === 'buy' ? t('portfolio.buy') : t('portfolio.sell') }}
                     </span>
                   </td>
                   <td class="px-4 py-3 text-white font-medium">{{ trans.ticker }}</td>
@@ -363,7 +364,7 @@ const deleteTransaction = async (id: number) => {
                     <button
                       @click.stop="deleteTransaction(trans.id)"
                       class="p-2 text-gray-500 hover:text-red-400 transition-colors"
-                      title="Remover transação"
+                      :title="t('portfolio.removeTransaction')"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                         <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />

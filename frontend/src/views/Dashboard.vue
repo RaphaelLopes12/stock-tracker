@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed, onUnmounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { quotesApi, newsApi } from '@/services/api'
+
+const { t } = useI18n()
 
 interface Quote {
   price: number
@@ -123,7 +126,7 @@ async function loadQuotes(limit = 15) {
     }))
     lastUpdate.value = new Date()
   } catch (e) {
-    error.value = 'Erro ao carregar cotações'
+    error.value = t('dashboard.loadingQuotes')
     console.error(e)
   } finally {
     loading.value = false
@@ -136,7 +139,7 @@ async function loadNews() {
     const response = await newsApi.getAll(10)
     news.value = response.data.news || []
   } catch (e) {
-    console.error('Erro ao carregar notícias:', e)
+    console.error('Error loading news:', e)
   } finally {
     loadingNews.value = false
   }
@@ -147,7 +150,7 @@ async function loadMarketSummary() {
     const response = await newsApi.getSummary()
     marketIndices.value = response.data.indices || []
   } catch (e) {
-    console.error('Erro ao carregar índices:', e)
+    console.error('Error loading indices:', e)
   }
 }
 
@@ -218,10 +221,10 @@ function formatTimeAgo(dateStr: string): string {
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
 
-  if (days > 0) return `${days}d atrás`
-  if (hours > 0) return `${hours}h atrás`
-  if (minutes > 0) return `${minutes}min atrás`
-  return 'agora'
+  if (days > 0) return t('common.daysAgo', { n: days })
+  if (hours > 0) return t('common.hoursAgo', { n: hours })
+  if (minutes > 0) return t('common.minutesAgo', { n: minutes })
+  return t('common.now')
 }
 
 function loadMore() {
@@ -252,11 +255,11 @@ function loadMore() {
             </span>
           </div>
           <div v-if="marketIndices.length === 0" class="text-gray-500 text-sm">
-            Carregando índices...
+            {{ t('dashboard.loadingIndices') }}
           </div>
         </div>
         <div v-if="lastUpdate" class="text-gray-500 text-xs">
-          Atualizado: {{ lastUpdate.toLocaleTimeString('pt-BR') }}
+          {{ t('dashboard.updated') }}: {{ lastUpdate.toLocaleTimeString('pt-BR') }}
         </div>
       </div>
     </div>
@@ -275,11 +278,11 @@ function loadMore() {
                 </svg>
               </div>
               <div>
-                <h2 class="text-lg font-semibold text-white">Oportunidades</h2>
-                <p class="text-xs text-gray-400">Ações com melhor score</p>
+                <h2 class="text-lg font-semibold text-white">{{ t('dashboard.opportunities') }}</h2>
+                <p class="text-xs text-gray-400">{{ t('dashboard.stocksWithBestScore') }}</p>
               </div>
             </div>
-            <span class="badge badge-buy">{{ bestToBuy.length }} ações</span>
+            <span class="badge badge-buy">{{ t('dashboard.nStocks', { n: bestToBuy.length }) }}</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -316,7 +319,7 @@ function loadMore() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                 </svg>
               </div>
-              <h3 class="font-semibold text-white">Maiores Altas</h3>
+              <h3 class="font-semibold text-white">{{ t('dashboard.topGainers') }}</h3>
             </div>
             <div class="space-y-2">
               <RouterLink
@@ -332,7 +335,7 @@ function loadMore() {
                 <span class="text-emerald-400 font-medium">{{ formatPercent(stock.quote?.change_percent) }}</span>
               </RouterLink>
               <div v-if="topGainers.length === 0" class="text-gray-500 text-sm text-center py-4">
-                Nenhuma ação em alta
+                {{ t('dashboard.noStocksUp') }}
               </div>
             </div>
           </div>
@@ -345,7 +348,7 @@ function loadMore() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
                 </svg>
               </div>
-              <h3 class="font-semibold text-white">Maiores Baixas</h3>
+              <h3 class="font-semibold text-white">{{ t('dashboard.topLosers') }}</h3>
             </div>
             <div class="space-y-2">
               <RouterLink
@@ -361,7 +364,7 @@ function loadMore() {
                 <span class="text-red-400 font-medium">{{ formatPercent(stock.quote?.change_percent) }}</span>
               </RouterLink>
               <div v-if="topLosers.length === 0" class="text-gray-500 text-sm text-center py-4">
-                Nenhuma ação em baixa
+                {{ t('dashboard.noStocksDown') }}
               </div>
             </div>
           </div>
@@ -369,7 +372,7 @@ function loadMore() {
 
         <!-- Sectors Performance -->
         <div class="bg-gray-800/50 rounded-xl p-5 border border-gray-700/50">
-          <h3 class="font-semibold text-white mb-4">Performance por Setor</h3>
+          <h3 class="font-semibold text-white mb-4">{{ t('dashboard.sectorPerformance') }}</h3>
           <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             <div
               v-for="sector in sectors.slice(0, 8)"
@@ -380,7 +383,7 @@ function loadMore() {
               <p :class="['font-semibold', sector.avgChange >= 0 ? 'text-emerald-400' : 'text-red-400']">
                 {{ formatPercent(sector.avgChange) }}
               </p>
-              <p class="text-xs text-gray-500">{{ sector.count }} ações</p>
+              <p class="text-xs text-gray-500">{{ t('dashboard.nStocks', { n: sector.count }) }}</p>
             </div>
           </div>
         </div>
@@ -388,13 +391,13 @@ function loadMore() {
         <!-- Stocks Table -->
         <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 overflow-hidden">
           <div class="p-4 border-b border-gray-700/50 flex items-center justify-between">
-            <h3 class="font-semibold text-white">Todas as Ações</h3>
+            <h3 class="font-semibold text-white">{{ t('dashboard.allStocks') }}</h3>
             <button
               @click="() => loadQuotes(currentLimit)"
               class="text-sm text-primary-400 hover:text-primary-300 transition-colors"
               :disabled="loading"
             >
-              {{ loading ? 'Atualizando...' : 'Atualizar' }}
+              {{ loading ? t('common.updating') : t('common.update') }}
             </button>
           </div>
 
@@ -402,12 +405,12 @@ function loadMore() {
             <table class="w-full">
               <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase">
                 <tr>
-                  <th class="px-4 py-3 text-left">Ação</th>
-                  <th class="px-4 py-3 text-right">Preço</th>
-                  <th class="px-4 py-3 text-right">Variação</th>
-                  <th class="px-4 py-3 text-center hidden sm:table-cell">Score</th>
-                  <th class="px-4 py-3 text-right hidden md:table-cell">P/L</th>
-                  <th class="px-4 py-3 text-right hidden md:table-cell">DY</th>
+                  <th class="px-4 py-3 text-left">{{ t('stocks.stock') }}</th>
+                  <th class="px-4 py-3 text-right">{{ t('stocks.price') }}</th>
+                  <th class="px-4 py-3 text-right">{{ t('stocks.change') }}</th>
+                  <th class="px-4 py-3 text-center hidden sm:table-cell">{{ t('stocks.score') }}</th>
+                  <th class="px-4 py-3 text-right hidden md:table-cell">{{ t('stocks.pl') }}</th>
+                  <th class="px-4 py-3 text-right hidden md:table-cell">{{ t('stocks.dy') }}</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-gray-700/50">
@@ -418,7 +421,7 @@ function loadMore() {
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      <span>Carregando...</span>
+                      <span>{{ t('common.loading') }}</span>
                     </div>
                   </td>
                 </tr>
@@ -463,7 +466,7 @@ function loadMore() {
 
           <div v-if="stocks.length >= currentLimit" class="p-4 border-t border-gray-700/50 text-center">
             <button @click="loadMore" class="text-primary-400 hover:text-primary-300 text-sm font-medium">
-              Carregar mais ações
+              {{ t('dashboard.loadMore') }}
             </button>
           </div>
         </div>
@@ -480,14 +483,14 @@ function loadMore() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
               </div>
-              <h3 class="font-semibold text-white">Notícias do Mercado</h3>
+              <h3 class="font-semibold text-white">{{ t('dashboard.marketNews') }}</h3>
             </div>
             <button
               @click="loadNews"
               class="text-xs text-gray-400 hover:text-white transition-colors"
               :disabled="loadingNews"
             >
-              Atualizar
+              {{ t('common.update') }}
             </button>
           </div>
 
@@ -497,7 +500,7 @@ function loadMore() {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Carregando notícias...
+              {{ t('dashboard.loadingNews') }}
             </div>
 
             <a
@@ -532,7 +535,7 @@ function loadMore() {
             </a>
 
             <div v-if="!loadingNews && news.length === 0" class="p-8 text-center text-gray-500">
-              Nenhuma notícia disponível
+              {{ t('dashboard.noNews') }}
             </div>
           </div>
         </div>
@@ -540,19 +543,19 @@ function loadMore() {
         <!-- Quick Stats -->
         <div class="grid grid-cols-2 gap-3">
           <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-            <p class="text-xs text-gray-400 mb-1">Ações Monitoradas</p>
+            <p class="text-xs text-gray-400 mb-1">{{ t('dashboard.monitoredStocks') }}</p>
             <p class="text-2xl font-bold text-white">{{ stocks.length }}</p>
           </div>
           <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-            <p class="text-xs text-gray-400 mb-1">Setores</p>
+            <p class="text-xs text-gray-400 mb-1">{{ t('dashboard.sectors') }}</p>
             <p class="text-2xl font-bold text-white">{{ sectors.length }}</p>
           </div>
           <div class="bg-emerald-500/10 rounded-xl p-4 border border-emerald-500/20">
-            <p class="text-xs text-emerald-400 mb-1">Em Alta</p>
+            <p class="text-xs text-emerald-400 mb-1">{{ t('dashboard.inHigh') }}</p>
             <p class="text-2xl font-bold text-emerald-400">{{ topGainers.length }}</p>
           </div>
           <div class="bg-red-500/10 rounded-xl p-4 border border-red-500/20">
-            <p class="text-xs text-red-400 mb-1">Em Baixa</p>
+            <p class="text-xs text-red-400 mb-1">{{ t('dashboard.inLow') }}</p>
             <p class="text-2xl font-bold text-red-400">{{ topLosers.length }}</p>
           </div>
         </div>

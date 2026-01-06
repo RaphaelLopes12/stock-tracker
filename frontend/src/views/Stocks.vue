@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useStocksStore } from '@/stores/stocks'
 
+const { t } = useI18n()
 const stocksStore = useStocksStore()
 
 const showAddModal = ref(false)
@@ -32,7 +34,7 @@ async function handleAddStock() {
 }
 
 async function handleRemoveStock(ticker: string) {
-  if (confirm(`Remover ${ticker}?`)) {
+  if (confirm(t('stocks.confirmRemove', { ticker }))) {
     await stocksStore.removeStock(ticker)
   }
 }
@@ -42,11 +44,11 @@ async function handleRemoveStock(ticker: string) {
   <div>
     <header class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Ações</h1>
-        <p class="text-gray-600 dark:text-gray-400 mt-1">Gerencie as ações que você acompanha</p>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ t('stocks.title') }}</h1>
+        <p class="text-gray-600 dark:text-gray-400 mt-1">{{ t('stocks.subtitle') }}</p>
       </div>
       <button @click="showAddModal = true" class="btn btn-primary">
-        + Adicionar Ação
+        {{ t('stocks.addStock') }}
       </button>
     </header>
 
@@ -55,11 +57,11 @@ async function handleRemoveStock(ticker: string) {
       <table class="w-full">
         <thead class="bg-gray-50 dark:bg-gray-800/50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ticker</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nome</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Setor</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Ações</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ t('stocks.ticker') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ t('stocks.name') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ t('stocks.sector') }}</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ t('stocks.status') }}</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">{{ t('stocks.actions') }}</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
@@ -80,7 +82,7 @@ async function handleRemoveStock(ticker: string) {
                     : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400',
                 ]"
               >
-                {{ stock.is_active ? 'Ativo' : 'Inativo' }}
+                {{ stock.is_active ? t('stocks.active') : t('stocks.inactive') }}
               </span>
             </td>
             <td class="px-6 py-4 text-right">
@@ -88,13 +90,13 @@ async function handleRemoveStock(ticker: string) {
                 @click="handleRemoveStock(stock.ticker)"
                 class="text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 text-sm"
               >
-                Remover
+                {{ t('stocks.remove') }}
               </button>
             </td>
           </tr>
           <tr v-if="stocksStore.stocks.length === 0">
             <td colspan="5" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
-              Nenhuma ação cadastrada
+              {{ t('stocks.noStocksRegistered') }}
             </td>
           </tr>
         </tbody>
@@ -108,47 +110,47 @@ async function handleRemoveStock(ticker: string) {
       @click.self="showAddModal = false"
     >
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
-        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">Adicionar Ação</h2>
+        <h2 class="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">{{ t('stocks.addStockTitle') }}</h2>
 
         <form @submit.prevent="handleAddStock" class="space-y-4">
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ticker</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ t('stocks.ticker') }}</label>
             <input
               v-model="newStock.ticker"
               type="text"
-              placeholder="Ex: WEGE3"
+              :placeholder="t('stocks.tickerPlaceholder')"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ t('stocks.name') }}</label>
             <input
               v-model="newStock.name"
               type="text"
-              placeholder="Ex: WEG S.A."
+              :placeholder="t('stocks.namePlaceholder')"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             />
           </div>
 
           <div>
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Setor (opcional)</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">{{ t('stocks.sectorOptional') }}</label>
             <input
               v-model="newStock.sector"
               type="text"
-              placeholder="Ex: Bens Industriais"
+              :placeholder="t('stocks.sectorPlaceholder')"
               class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             />
           </div>
 
           <div class="flex justify-end gap-3 pt-4">
             <button type="button" @click="showAddModal = false" class="btn btn-secondary">
-              Cancelar
+              {{ t('common.cancel') }}
             </button>
             <button type="submit" :disabled="submitting" class="btn btn-primary">
-              {{ submitting ? 'Salvando...' : 'Adicionar' }}
+              {{ submitting ? t('stocks.saving') : t('stocks.add') }}
             </button>
           </div>
         </form>

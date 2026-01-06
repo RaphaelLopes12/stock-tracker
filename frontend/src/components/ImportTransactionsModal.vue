@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { portfolioApi, type ImportResult } from '@/services/api'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   close: []
@@ -14,7 +17,7 @@ const loading = ref(false)
 const result = ref<ImportResult | null>(null)
 const error = ref<string | null>(null)
 
-// Opções de importação
+// Opcoes de importacao
 const skipDuplicates = ref(true)
 const createMissingStocks = ref(true)
 
@@ -47,7 +50,7 @@ const selectFile = (selectedFile: File) => {
     validExtensions.some(ext => selectedFile.name.toLowerCase().endsWith(ext))
 
   if (!isValidType) {
-    error.value = 'Arquivo inválido. Selecione um arquivo CSV ou TXT.'
+    error.value = t('common.error')
     return
   }
 
@@ -112,7 +115,7 @@ const importFile = async () => {
       emit('imported')
     }
   } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Erro ao importar arquivo'
+    error.value = e.response?.data?.detail || t('importTransactions.importError')
   } finally {
     loading.value = false
   }
@@ -134,8 +137,8 @@ const formatFileSize = (bytes: number) => {
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-700">
         <div>
-          <h2 class="text-xl font-semibold text-white">Importar Transações</h2>
-          <p class="text-sm text-gray-400 mt-1">Importe suas operações de um arquivo CSV</p>
+          <h2 class="text-xl font-semibold text-white">{{ t('importTransactions.title') }}</h2>
+          <p class="text-sm text-gray-400 mt-1">{{ t('importTransactions.subtitle') }}</p>
         </div>
         <button
           @click="emit('close')"
@@ -156,11 +159,9 @@ const formatFileSize = (bytes: number) => {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h3 class="font-medium text-blue-400 text-sm mb-1">Formatos aceitos</h3>
+              <h3 class="font-medium text-blue-400 text-sm mb-1">{{ t('importTransactions.acceptedFormats') }}</h3>
               <p class="text-xs text-gray-400">
-                O sistema detecta automaticamente arquivos da Área do Investidor (B3),
-                notas de corretagem convertidas (Clear, XP, Rico) ou qualquer CSV com colunas:
-                data, ticker, tipo (compra/venda), quantidade e preço.
+                {{ t('importTransactions.formatDescription') }}
               </p>
             </div>
           </div>
@@ -188,9 +189,9 @@ const formatFileSize = (bytes: number) => {
             <svg class="w-12 h-12 mx-auto text-gray-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
             </svg>
-            <p class="text-gray-400 mb-2">Arraste o arquivo CSV aqui ou</p>
+            <p class="text-gray-400 mb-2">{{ t('importTransactions.dropHere') }}</p>
             <label class="btn btn-primary cursor-pointer inline-block">
-              Selecionar arquivo
+              {{ t('importTransactions.selectFile') }}
               <input
                 type="file"
                 accept=".csv,.txt"
@@ -198,7 +199,7 @@ const formatFileSize = (bytes: number) => {
                 @change="handleFileSelect"
               />
             </label>
-            <p class="text-xs text-gray-500 mt-3">CSV ou TXT até 10MB</p>
+            <p class="text-xs text-gray-500 mt-3">{{ t('importTransactions.fileLimit') }}</p>
           </div>
 
           <div v-else class="flex items-center justify-between">
@@ -232,7 +233,7 @@ const formatFileSize = (bytes: number) => {
               v-model="skipDuplicates"
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary-500 focus:ring-primary-500"
             />
-            <span class="text-sm text-gray-300">Ignorar transações duplicadas</span>
+            <span class="text-sm text-gray-300">{{ t('importTransactions.skipDuplicates') }}</span>
           </label>
           <label class="flex items-center gap-3 cursor-pointer">
             <input
@@ -240,7 +241,7 @@ const formatFileSize = (bytes: number) => {
               v-model="createMissingStocks"
               class="w-4 h-4 rounded border-gray-600 bg-gray-700 text-primary-500 focus:ring-primary-500"
             />
-            <span class="text-sm text-gray-300">Criar ações que não existem automaticamente</span>
+            <span class="text-sm text-gray-300">{{ t('importTransactions.createMissingStocks') }}</span>
           </label>
         </div>
 
@@ -282,22 +283,22 @@ const formatFileSize = (bytes: number) => {
                 'text-red-400': resultStatus === 'error',
                 'text-gray-400': resultStatus === 'empty',
               }">
-                {{ resultStatus === 'success' ? 'Importação concluída!' :
-                   resultStatus === 'partial' ? 'Importação parcial' :
-                   resultStatus === 'error' ? 'Erro na importação' :
-                   'Nenhuma transação importada' }}
+                {{ resultStatus === 'success' ? t('importTransactions.importCompleted') :
+                   resultStatus === 'partial' ? t('importTransactions.partialImport') :
+                   resultStatus === 'error' ? t('importTransactions.importError') :
+                   t('importTransactions.noTransactionsImported') }}
               </p>
               <p class="text-sm text-gray-400">
-                {{ result.success_count }} importadas,
-                {{ result.skipped_count }} ignoradas,
-                {{ result.error_count }} com erro
+                {{ result.success_count }} {{ t('importTransactions.imported') }},
+                {{ result.skipped_count }} {{ t('importTransactions.skipped') }},
+                {{ result.error_count }} {{ t('importTransactions.withError') }}
               </p>
             </div>
           </div>
 
           <!-- Warnings -->
           <div v-if="result.warnings.length > 0" class="bg-gray-700/50 rounded-lg p-4">
-            <h4 class="text-sm font-medium text-gray-300 mb-2">Informações:</h4>
+            <h4 class="text-sm font-medium text-gray-300 mb-2">{{ t('importTransactions.information') }}</h4>
             <ul class="space-y-1">
               <li
                 v-for="(warn, idx) in result.warnings"
@@ -312,7 +313,7 @@ const formatFileSize = (bytes: number) => {
 
           <!-- Errors -->
           <div v-if="result.errors.length > 0" class="bg-red-500/10 rounded-lg p-4 max-h-40 overflow-y-auto">
-            <h4 class="text-sm font-medium text-red-400 mb-2">Erros encontrados:</h4>
+            <h4 class="text-sm font-medium text-red-400 mb-2">{{ t('importTransactions.errors') }}</h4>
             <ul class="space-y-1">
               <li
                 v-for="(err, idx) in result.errors"
@@ -327,7 +328,7 @@ const formatFileSize = (bytes: number) => {
 
           <!-- Created Stocks -->
           <div v-if="result.created_stocks.length > 0" class="bg-blue-500/10 rounded-lg p-4">
-            <h4 class="text-sm font-medium text-blue-400 mb-2">Ações criadas:</h4>
+            <h4 class="text-sm font-medium text-blue-400 mb-2">{{ t('importTransactions.createdStocks') }}</h4>
             <div class="flex flex-wrap gap-2">
               <span
                 v-for="ticker in result.created_stocks"
@@ -338,7 +339,7 @@ const formatFileSize = (bytes: number) => {
               </span>
             </div>
             <p class="text-xs text-gray-500 mt-2">
-              Acesse "Ações" para atualizar os nomes dessas ações.
+              {{ t('importTransactions.updateStockNames') }}
             </p>
           </div>
         </div>
@@ -353,7 +354,7 @@ const formatFileSize = (bytes: number) => {
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          Baixar modelo CSV
+          {{ t('portfolio.downloadCsvTemplate') }}
         </button>
 
         <div class="flex gap-3">
@@ -362,14 +363,14 @@ const formatFileSize = (bytes: number) => {
             @click="clearFile"
             class="btn btn-secondary"
           >
-            Importar outro
+            {{ t('portfolio.importAnother') }}
           </button>
           <button
             v-if="!hasResult"
             @click="emit('close')"
             class="btn btn-secondary"
           >
-            Cancelar
+            {{ t('common.cancel') }}
           </button>
           <button
             v-if="!hasResult"
@@ -382,16 +383,16 @@ const formatFileSize = (bytes: number) => {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              Importando...
+              {{ t('importTransactions.importing') }}
             </span>
-            <span v-else>Importar</span>
+            <span v-else>{{ t('importTransactions.import') }}</span>
           </button>
           <button
             v-if="hasResult"
             @click="emit('close')"
             class="btn btn-primary"
           >
-            Concluir
+            {{ t('importTransactions.done') }}
           </button>
         </div>
       </div>

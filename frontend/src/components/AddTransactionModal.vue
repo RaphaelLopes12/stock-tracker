@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { usePortfolioStore } from '@/stores/portfolio'
 import { stockApi, type TransactionCreate } from '@/services/api'
+
+const { t } = useI18n()
 
 const emit = defineEmits<{
   close: []
@@ -57,7 +60,7 @@ onMounted(async () => {
     const response = await stockApi.list(true)
     stocks.value = response.data.map((s: any) => ({ ticker: s.ticker, name: s.name }))
   } catch (e) {
-    console.error('Erro ao carregar ações:', e)
+    console.error('Erro ao carregar acoes:', e)
   }
 })
 
@@ -114,7 +117,7 @@ const submit = async () => {
     await portfolioStore.addTransaction(data)
     emit('added')
   } catch (e: any) {
-    error.value = e.response?.data?.detail || 'Erro ao registrar transação'
+    error.value = e.response?.data?.detail || t('addTransaction.errorRegistering')
   } finally {
     loading.value = false
   }
@@ -138,7 +141,7 @@ const formatCurrency = (value: number | null) => {
     <div class="bg-gray-800 rounded-xl shadow-2xl w-full max-w-md">
       <!-- Header -->
       <div class="flex items-center justify-between p-6 border-b border-gray-700">
-        <h2 class="text-xl font-semibold text-white">Nova Transação</h2>
+        <h2 class="text-xl font-semibold text-white">{{ t('addTransaction.title') }}</h2>
         <button
           @click="emit('close')"
           class="text-gray-400 hover:text-white transition-colors"
@@ -158,7 +161,7 @@ const formatCurrency = (value: number | null) => {
 
         <!-- Type -->
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Tipo</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.type') }}</label>
           <div class="flex gap-2">
             <button
               type="button"
@@ -166,7 +169,7 @@ const formatCurrency = (value: number | null) => {
               class="flex-1 py-2 px-4 rounded-lg font-medium transition-colors"
               :class="type === 'buy' ? 'bg-emerald-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
             >
-              Compra
+              {{ t('addTransaction.buy') }}
             </button>
             <button
               type="button"
@@ -174,18 +177,18 @@ const formatCurrency = (value: number | null) => {
               class="flex-1 py-2 px-4 rounded-lg font-medium transition-colors"
               :class="type === 'sell' ? 'bg-red-600 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'"
             >
-              Venda
+              {{ t('addTransaction.sell') }}
             </button>
           </div>
         </div>
 
         <!-- Ticker -->
         <div class="relative">
-          <label class="block text-sm font-medium text-gray-400 mb-2">Ativo</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.asset') }}</label>
           <input
             v-model="ticker"
             type="text"
-            placeholder="Ex: WEGE3"
+            :placeholder="t('addTransaction.assetPlaceholder')"
             class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent uppercase"
             @focus="showSuggestions = true"
             @blur="hideSuggestions"
@@ -214,7 +217,7 @@ const formatCurrency = (value: number | null) => {
         <!-- Quantity and Price -->
         <div class="grid grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">Quantidade</label>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.quantity') }}</label>
             <input
               v-model.number="quantity"
               type="number"
@@ -225,7 +228,7 @@ const formatCurrency = (value: number | null) => {
             />
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-400 mb-2">Preço (R$)</label>
+            <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.pricePerUnit') }}</label>
             <input
               v-model.number="price"
               type="number"
@@ -239,13 +242,13 @@ const formatCurrency = (value: number | null) => {
 
         <!-- Total -->
         <div v-if="totalValue > 0" class="bg-gray-700/50 rounded-lg p-3">
-          <p class="text-sm text-gray-400">Valor Total</p>
+          <p class="text-sm text-gray-400">{{ t('addTransaction.totalValue') }}</p>
           <p class="text-xl font-semibold text-white">{{ formatCurrency(totalValue) }}</p>
         </div>
 
         <!-- Date -->
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Data</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.date') }}</label>
           <input
             v-model="date"
             type="date"
@@ -255,7 +258,7 @@ const formatCurrency = (value: number | null) => {
 
         <!-- Fees -->
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Taxas/Corretagem (opcional)</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.feesOptional') }}</label>
           <input
             v-model.number="fees"
             type="number"
@@ -268,11 +271,11 @@ const formatCurrency = (value: number | null) => {
 
         <!-- Notes -->
         <div>
-          <label class="block text-sm font-medium text-gray-400 mb-2">Observações (opcional)</label>
+          <label class="block text-sm font-medium text-gray-400 mb-2">{{ t('addTransaction.notesOptional') }}</label>
           <textarea
             v-model="notes"
             rows="2"
-            placeholder="Motivo da operação, estratégia, etc."
+            :placeholder="t('addTransaction.notesPlaceholder')"
             class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
           ></textarea>
         </div>
@@ -284,7 +287,7 @@ const formatCurrency = (value: number | null) => {
             @click="emit('close')"
             class="flex-1 py-2 px-4 bg-gray-700 text-white rounded-lg font-medium hover:bg-gray-600 transition-colors"
           >
-            Cancelar
+            {{ t('common.cancel') }}
           </button>
           <button
             type="submit"
@@ -292,8 +295,8 @@ const formatCurrency = (value: number | null) => {
             class="flex-1 py-2 px-4 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             :class="type === 'buy' ? 'bg-emerald-600 hover:bg-emerald-700 text-white' : 'bg-red-600 hover:bg-red-700 text-white'"
           >
-            <span v-if="loading">Salvando...</span>
-            <span v-else>{{ type === 'buy' ? 'Registrar Compra' : 'Registrar Venda' }}</span>
+            <span v-if="loading">{{ t('addTransaction.saving') }}</span>
+            <span v-else>{{ type === 'buy' ? t('addTransaction.registerBuy') : t('addTransaction.registerSell') }}</span>
           </button>
         </div>
       </form>

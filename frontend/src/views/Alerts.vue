@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { alertsApi, stockApi, type Alert, type AlertCreate } from '@/services/api'
+
+const { t } = useI18n()
 
 // Estado
 const alerts = ref<Alert[]>([])
@@ -72,7 +75,7 @@ async function handleCreateAlert() {
     resetForm()
     await loadData()
   } catch (e: any) {
-    alert(e.response?.data?.detail || 'Erro ao criar alerta')
+    alert(e.response?.data?.detail || t('common.error'))
   } finally {
     submitting.value = false
   }
@@ -101,7 +104,7 @@ async function toggleAlert(alert: Alert) {
 
 // Deletar alerta
 async function deleteAlert(alert: Alert) {
-  if (!confirm(`Remover alerta "${alert.name}"?`)) return
+  if (!confirm(t('alerts.confirmRemove', { name: alert.name }))) return
 
   try {
     await alertsApi.delete(alert.id)
@@ -119,24 +122,24 @@ async function checkAlert(alert: Alert) {
     const res = await alertsApi.check(alert.id)
     checkResult.value = res.data
   } catch (e: any) {
-    checkResult.value = { error: e.response?.data?.detail || 'Erro ao verificar' }
+    checkResult.value = { error: e.response?.data?.detail || t('common.error') }
   } finally {
     checkingAlert.value = null
   }
 }
 
-// Formatar tipo para exibição
+// Formatar tipo para exibicao
 function formatAlertType(type: string): string {
   const types: Record<string, string> = {
-    price: 'Preço',
-    change_percent: 'Variação',
-    pe_ratio: 'P/L',
-    dividend_yield: 'DY',
+    price: t('alerts.price'),
+    change_percent: t('alerts.variation'),
+    pe_ratio: t('stocks.pl'),
+    dividend_yield: t('stocks.dy'),
   }
   return types[type] || type
 }
 
-// Formatar condição
+// Formatar condicao
 function formatCondition(alert: Alert): string {
   const op = alert.condition.operator
   const val = alert.condition.value
@@ -145,13 +148,13 @@ function formatCondition(alert: Alert): string {
     return `${op === 'above' ? '>' : '<'} R$ ${val.toFixed(2)}`
   }
   if (alert.type === 'change_percent') {
-    return `${op === 'change_up' ? 'Alta >' : 'Queda >'} ${val}%`
+    return `${op === 'change_up' ? '>' : '>'} ${val}%`
   }
   if (alert.type === 'pe_ratio') {
-    return `P/L ${op === 'above' ? '>' : '<'} ${val}`
+    return `${t('stocks.pl')} ${op === 'above' ? '>' : '<'} ${val}`
   }
   if (alert.type === 'dividend_yield') {
-    return `DY ${op === 'above' ? '>' : '<'} ${val}%`
+    return `${t('stocks.dy')} ${op === 'above' ? '>' : '<'} ${val}%`
   }
   return `${op} ${val}`
 }
@@ -171,13 +174,13 @@ onMounted(loadData)
   <div>
     <header class="flex items-center justify-between mb-8">
       <div>
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">Alertas</h1>
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-gray-100">{{ t('alerts.title') }}</h1>
         <p class="text-gray-600 dark:text-gray-400 mt-1">
-          Receba notificações quando suas ações atingirem valores importantes
+          {{ t('alerts.subtitle') }}
         </p>
       </div>
       <button @click="showModal = true" class="btn btn-primary">
-        + Novo Alerta
+        {{ t('alerts.newAlert') }}
       </button>
     </header>
 
@@ -190,10 +193,9 @@ onMounted(loadData)
           </svg>
         </div>
         <div>
-          <h3 class="font-medium text-blue-400 mb-1">Dica para iniciantes</h3>
+          <h3 class="font-medium text-blue-400 mb-1">{{ t('alerts.tipTitle') }}</h3>
           <p class="text-sm text-gray-400">
-            Alertas ajudam você a monitorar o mercado sem ficar olhando os preços o tempo todo.
-            Defina um preço que você considera bom para comprar e deixe o sistema avisar quando chegar lá!
+            {{ t('alerts.tipDescription') }}
           </p>
         </div>
       </div>
@@ -205,7 +207,7 @@ onMounted(loadData)
         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
       </svg>
-      Carregando alertas...
+      {{ t('alerts.loadingAlerts') }}
     </div>
 
     <!-- Lista de alertas -->
@@ -245,21 +247,21 @@ onMounted(loadData)
           </div>
 
           <div class="flex items-center gap-6">
-            <!-- Condição -->
+            <!-- Condicao -->
             <div class="text-right">
               <p class="text-xl font-bold text-white">{{ formatCondition(alert) }}</p>
               <p v-if="alert.trigger_count > 0" class="text-xs text-gray-500">
-                Disparou {{ alert.trigger_count }}x
+                {{ t('alerts.triggered', { n: alert.trigger_count }) }}
               </p>
             </div>
 
-            <!-- Ações -->
+            <!-- Acoes -->
             <div class="flex items-center gap-2">
               <button
                 @click="checkAlert(alert)"
                 :disabled="checkingAlert === alert.id"
                 class="p-2 text-gray-400 hover:text-blue-400 transition-colors"
-                title="Verificar agora"
+                :title="t('alerts.checkNow')"
               >
                 <svg v-if="checkingAlert === alert.id" class="animate-spin w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -272,7 +274,7 @@ onMounted(loadData)
               <button
                 @click="deleteAlert(alert)"
                 class="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                title="Remover"
+                :title="t('alerts.remove')"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -282,7 +284,7 @@ onMounted(loadData)
           </div>
         </div>
 
-        <!-- Resultado da verificação -->
+        <!-- Resultado da verificacao -->
         <div v-if="checkResult && checkResult.alert_id === alert.id" class="mt-4 pt-4 border-t border-gray-700">
           <div v-if="checkResult.error" class="text-red-400 text-sm">
             {{ checkResult.error }}
@@ -292,10 +294,10 @@ onMounted(loadData)
               class="px-3 py-1 rounded-full text-sm font-medium"
               :class="checkResult.triggered ? 'bg-emerald-500/20 text-emerald-400' : 'bg-gray-700 text-gray-400'"
             >
-              {{ checkResult.triggered ? 'Condição atingida!' : 'Condição não atingida' }}
+              {{ checkResult.triggered ? t('alerts.conditionMet') : t('alerts.conditionNotMet') }}
             </div>
             <p class="text-sm text-gray-400">
-              Preço atual: R$ {{ checkResult.current_quote?.price?.toFixed(2) || '--' }}
+              {{ t('alerts.currentPrice') }}: R$ {{ checkResult.current_quote?.price?.toFixed(2) || '--' }}
             </p>
             <p v-if="checkResult.message" class="text-sm text-emerald-400">
               {{ checkResult.message }}
@@ -310,12 +312,12 @@ onMounted(loadData)
       <svg class="w-16 h-16 mx-auto text-gray-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
       </svg>
-      <h3 class="text-lg font-medium text-gray-300 mb-2">Nenhum alerta configurado</h3>
+      <h3 class="text-lg font-medium text-gray-300 mb-2">{{ t('alerts.noAlertsTitle') }}</h3>
       <p class="text-gray-500 mb-6 max-w-md mx-auto">
-        Crie alertas para ser notificado quando uma ação atingir um preço ou indicador importante para você.
+        {{ t('alerts.noAlertsDescription') }}
       </p>
       <button @click="showModal = true" class="btn btn-primary">
-        Criar primeiro alerta
+        {{ t('alerts.createFirstAlert') }}
       </button>
     </div>
 
@@ -327,20 +329,20 @@ onMounted(loadData)
     >
       <div class="bg-gray-800 rounded-lg shadow-xl w-full max-w-lg">
         <div class="p-6 border-b border-gray-700">
-          <h2 class="text-xl font-bold text-white">Novo Alerta</h2>
-          <p class="text-sm text-gray-400 mt-1">Configure quando você quer ser notificado</p>
+          <h2 class="text-xl font-bold text-white">{{ t('alerts.newAlertTitle') }}</h2>
+          <p class="text-sm text-gray-400 mt-1">{{ t('alerts.configureNotification') }}</p>
         </div>
 
         <form @submit.prevent="handleCreateAlert" class="p-6 space-y-6">
-          <!-- Selecionar ação -->
+          <!-- Selecionar acao -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Qual ação?</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2">{{ t('alerts.whichStock') }}</label>
             <select
               v-model="newAlert.ticker"
               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
               required
             >
-              <option value="">Selecione uma ação...</option>
+              <option value="">{{ t('alerts.selectStock') }}</option>
               <option v-for="stock in stocks" :key="stock.ticker" :value="stock.ticker">
                 {{ stock.ticker }} - {{ stock.name }}
               </option>
@@ -349,7 +351,7 @@ onMounted(loadData)
 
           <!-- Tipo de alerta -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Tipo de alerta</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2">{{ t('alerts.alertType') }}</label>
             <div class="grid grid-cols-2 gap-3">
               <button
                 v-for="type in alertTypes"
@@ -367,10 +369,10 @@ onMounted(loadData)
             </div>
           </div>
 
-          <!-- Condição -->
+          <!-- Condicao -->
           <div v-if="selectedType" class="grid grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">Quando</label>
+              <label class="block text-sm font-medium text-gray-300 mb-2">{{ t('alerts.when') }}</label>
               <select
                 v-model="newAlert.operator"
                 class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-primary-500"
@@ -395,37 +397,37 @@ onMounted(loadData)
 
           <!-- Nome opcional -->
           <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">Nome do alerta (opcional)</label>
+            <label class="block text-sm font-medium text-gray-300 mb-2">{{ t('alerts.alertNameOptional') }}</label>
             <input
               v-model="newAlert.name"
               type="text"
-              placeholder="Ex: Preço bom para comprar"
+              :placeholder="t('alerts.alertNamePlaceholder')"
               class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-primary-500"
             />
           </div>
 
-          <!-- Explicação -->
+          <!-- Explicacao -->
           <div v-if="selectedType" class="p-3 bg-gray-700/50 rounded-lg">
             <p class="text-sm text-gray-400">
               <strong class="text-gray-300">{{ selectedType.description }}</strong>
             </p>
           </div>
 
-          <!-- Botões -->
+          <!-- Botoes -->
           <div class="flex justify-end gap-3 pt-4 border-t border-gray-700">
             <button
               type="button"
               @click="showModal = false; resetForm()"
               class="btn btn-secondary"
             >
-              Cancelar
+              {{ t('common.cancel') }}
             </button>
             <button
               type="submit"
               :disabled="submitting || !newAlert.ticker || !newAlert.value"
               class="btn btn-primary"
             >
-              {{ submitting ? 'Criando...' : 'Criar Alerta' }}
+              {{ submitting ? t('alerts.creating') : t('alerts.createAlert') }}
             </button>
           </div>
         </form>
