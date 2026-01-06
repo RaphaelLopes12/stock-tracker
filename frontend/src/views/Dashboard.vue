@@ -123,7 +123,7 @@ async function loadQuotes(limit = 15) {
     }))
     lastUpdate.value = new Date()
   } catch (e) {
-    error.value = 'Erro ao carregar cotacoes'
+    error.value = 'Erro ao carregar cotações'
     console.error(e)
   } finally {
     loading.value = false
@@ -136,7 +136,7 @@ async function loadNews() {
     const response = await newsApi.getAll(10)
     news.value = response.data.news || []
   } catch (e) {
-    console.error('Erro ao carregar noticias:', e)
+    console.error('Erro ao carregar notícias:', e)
   } finally {
     loadingNews.value = false
   }
@@ -147,7 +147,7 @@ async function loadMarketSummary() {
     const response = await newsApi.getSummary()
     marketIndices.value = response.data.indices || []
   } catch (e) {
-    console.error('Erro ao carregar indices:', e)
+    console.error('Erro ao carregar índices:', e)
   }
 }
 
@@ -218,9 +218,9 @@ function formatTimeAgo(dateStr: string): string {
   const hours = Math.floor(minutes / 60)
   const days = Math.floor(hours / 24)
 
-  if (days > 0) return `${days}d atras`
-  if (hours > 0) return `${hours}h atras`
-  if (minutes > 0) return `${minutes}min atras`
+  if (days > 0) return `${days}d atrás`
+  if (hours > 0) return `${hours}h atrás`
+  if (minutes > 0) return `${minutes}min atrás`
   return 'agora'
 }
 
@@ -252,7 +252,7 @@ function loadMore() {
             </span>
           </div>
           <div v-if="marketIndices.length === 0" class="text-gray-500 text-sm">
-            Carregando indices...
+            Carregando índices...
           </div>
         </div>
         <div v-if="lastUpdate" class="text-gray-500 text-xs">
@@ -276,10 +276,10 @@ function loadMore() {
               </div>
               <div>
                 <h2 class="text-lg font-semibold text-white">Oportunidades</h2>
-                <p class="text-xs text-gray-400">Acoes com melhor score</p>
+                <p class="text-xs text-gray-400">Ações com melhor score</p>
               </div>
             </div>
-            <span class="badge badge-buy">{{ bestToBuy.length }} acoes</span>
+            <span class="badge badge-buy">{{ bestToBuy.length }} ações</span>
           </div>
 
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
@@ -332,7 +332,7 @@ function loadMore() {
                 <span class="text-emerald-400 font-medium">{{ formatPercent(stock.quote?.change_percent) }}</span>
               </RouterLink>
               <div v-if="topGainers.length === 0" class="text-gray-500 text-sm text-center py-4">
-                Nenhuma acao em alta
+                Nenhuma ação em alta
               </div>
             </div>
           </div>
@@ -361,7 +361,7 @@ function loadMore() {
                 <span class="text-red-400 font-medium">{{ formatPercent(stock.quote?.change_percent) }}</span>
               </RouterLink>
               <div v-if="topLosers.length === 0" class="text-gray-500 text-sm text-center py-4">
-                Nenhuma acao em baixa
+                Nenhuma ação em baixa
               </div>
             </div>
           </div>
@@ -380,7 +380,7 @@ function loadMore() {
               <p :class="['font-semibold', sector.avgChange >= 0 ? 'text-emerald-400' : 'text-red-400']">
                 {{ formatPercent(sector.avgChange) }}
               </p>
-              <p class="text-xs text-gray-500">{{ sector.count }} acoes</p>
+              <p class="text-xs text-gray-500">{{ sector.count }} ações</p>
             </div>
           </div>
         </div>
@@ -388,7 +388,7 @@ function loadMore() {
         <!-- Stocks Table -->
         <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 overflow-hidden">
           <div class="p-4 border-b border-gray-700/50 flex items-center justify-between">
-            <h3 class="font-semibold text-white">Todas as Acoes</h3>
+            <h3 class="font-semibold text-white">Todas as Ações</h3>
             <button
               @click="() => loadQuotes(currentLimit)"
               class="text-sm text-primary-400 hover:text-primary-300 transition-colors"
@@ -402,9 +402,9 @@ function loadMore() {
             <table class="w-full">
               <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase">
                 <tr>
-                  <th class="px-4 py-3 text-left">Acao</th>
-                  <th class="px-4 py-3 text-right">Preco</th>
-                  <th class="px-4 py-3 text-right">Variacao</th>
+                  <th class="px-4 py-3 text-left">Ação</th>
+                  <th class="px-4 py-3 text-right">Preço</th>
+                  <th class="px-4 py-3 text-right">Variação</th>
                   <th class="px-4 py-3 text-center hidden sm:table-cell">Score</th>
                   <th class="px-4 py-3 text-right hidden md:table-cell">P/L</th>
                   <th class="px-4 py-3 text-right hidden md:table-cell">DY</th>
@@ -463,7 +463,7 @@ function loadMore() {
 
           <div v-if="stocks.length >= currentLimit" class="p-4 border-t border-gray-700/50 text-center">
             <button @click="loadMore" class="text-primary-400 hover:text-primary-300 text-sm font-medium">
-              Carregar mais acoes
+              Carregar mais ações
             </button>
           </div>
         </div>
@@ -480,7 +480,7 @@ function loadMore() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
               </div>
-              <h3 class="font-semibold text-white">Noticias do Mercado</h3>
+              <h3 class="font-semibold text-white">Notícias do Mercado</h3>
             </div>
             <button
               @click="loadNews"
@@ -497,7 +497,7 @@ function loadMore() {
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-              Carregando noticias...
+              Carregando notícias...
             </div>
 
             <a
@@ -532,7 +532,7 @@ function loadMore() {
             </a>
 
             <div v-if="!loadingNews && news.length === 0" class="p-8 text-center text-gray-500">
-              Nenhuma noticia disponivel
+              Nenhuma notícia disponível
             </div>
           </div>
         </div>
@@ -540,7 +540,7 @@ function loadMore() {
         <!-- Quick Stats -->
         <div class="grid grid-cols-2 gap-3">
           <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">
-            <p class="text-xs text-gray-400 mb-1">Acoes Monitoradas</p>
+            <p class="text-xs text-gray-400 mb-1">Ações Monitoradas</p>
             <p class="text-2xl font-bold text-white">{{ stocks.length }}</p>
           </div>
           <div class="bg-gray-800/50 rounded-xl p-4 border border-gray-700/50">

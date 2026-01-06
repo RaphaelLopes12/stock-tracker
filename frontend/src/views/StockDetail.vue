@@ -65,8 +65,8 @@ function formatNewsDate(dateStr: string | null): string {
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24))
 
   if (diffHours < 1) return 'Agora'
-  if (diffHours < 24) return `${diffHours}h atras`
-  if (diffDays < 7) return `${diffDays}d atras`
+  if (diffHours < 24) return `${diffHours}h atrás`
+  if (diffDays < 7) return `${diffDays}d atrás`
   return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' })
 }
 
@@ -140,11 +140,11 @@ function handleChartMouseMove(event: MouseEvent) {
   const x = event.clientX - rect.left
   const relativeX = x / rect.width
 
-  // Encontrar o indice mais proximo
+  // Encontrar o índice mais próximo
   const index = Math.round(relativeX * (history.value.length - 1))
   hoveredIndex.value = Math.max(0, Math.min(index, history.value.length - 1))
 
-  // Posicao do tooltip
+  // Posição do tooltip
   tooltipX.value = x
   tooltipY.value = event.clientY - rect.top
 }
@@ -164,7 +164,7 @@ onMounted(async () => {
       quote.value = analysisRes.data.quote
       analysis.value = analysisRes.data.analysis
     }
-    // Carregar historico e noticias em paralelo
+    // Carregar histórico e notícias em paralelo
     await Promise.all([
       loadHistory('6mo'),
       loadNews(),
@@ -220,18 +220,18 @@ function formatMarketCap(value: number | null | undefined): string {
 
 // Tooltips educativos
 const tooltips = {
-  abertura: 'Preco da acao no inicio do pregao de hoje. Compara com o fechamento anterior para ver como o mercado abriu.',
-  maxima: 'Maior preco atingido pela acao durante o dia. Mostra o pico de otimismo dos investidores.',
-  minima: 'Menor preco atingido pela acao durante o dia. Mostra o ponto de maior pessimismo.',
-  fechAnterior: 'Preco de fechamento do dia anterior. Base para calcular a variacao percentual do dia.',
-  volume: 'Quantidade de acoes negociadas. Alto volume indica muito interesse dos investidores na acao.',
-  marketCap: 'Valor de Mercado: preco da acao x total de acoes. Mostra o tamanho da empresa na bolsa.',
-  pl: 'Preco/Lucro: quantos anos levaria para recuperar o investimento com os lucros atuais. P/L baixo (< 15) pode indicar acao barata, P/L alto (> 25) pode indicar acao cara ou expectativa de crescimento.',
-  dy: 'Dividend Yield: percentual do preco que voce recebe em dividendos por ano. Acima de 6% e considerado excelente para renda passiva.',
-  min52: 'Menor preco da acao nos ultimos 12 meses. Ajuda a ver se o preco atual esta proximo de um fundo historico.',
-  max52: 'Maior preco da acao nos ultimos 12 meses. Ajuda a ver se o preco atual esta proximo de um topo historico.',
-  range52: 'Mostra onde o preco atual esta em relacao ao range de precos do ultimo ano. Perto do minimo pode indicar oportunidade, perto do maximo pode indicar cautela.',
-  score: 'Pontuacao baseada em varios indicadores. Score alto indica mais sinais positivos para compra.',
+  abertura: 'Preço da ação no início do pregão de hoje. Compara com o fechamento anterior para ver como o mercado abriu.',
+  maxima: 'Maior preço atingido pela ação durante o dia. Mostra o pico de otimismo dos investidores.',
+  minima: 'Menor preço atingido pela ação durante o dia. Mostra o ponto de maior pessimismo.',
+  fechAnterior: 'Preço de fechamento do dia anterior. Base para calcular a variação percentual do dia.',
+  volume: 'Quantidade de ações negociadas. Alto volume indica muito interesse dos investidores na ação.',
+  marketCap: 'Valor de Mercado: preço da ação x total de ações. Mostra o tamanho da empresa na bolsa.',
+  pl: 'Preço/Lucro: quantos anos levaria para recuperar o investimento com os lucros atuais. P/L baixo (< 15) pode indicar ação barata, P/L alto (> 25) pode indicar ação cara ou expectativa de crescimento.',
+  dy: 'Dividend Yield: percentual do preço que você recebe em dividendos por ano. Acima de 6% é considerado excelente para renda passiva.',
+  min52: 'Menor preço da ação nos últimos 12 meses. Ajuda a ver se o preço atual está próximo de um fundo histórico.',
+  max52: 'Maior preço da ação nos últimos 12 meses. Ajuda a ver se o preço atual está próximo de um topo histórico.',
+  range52: 'Mostra onde o preço atual está em relação ao range de preços do último ano. Perto do mínimo pode indicar oportunidade, perto do máximo pode indicar cautela.',
+  score: 'Pontuação baseada em vários indicadores. Score alto indica mais sinais positivos para compra.',
 }
 
 // Controle de tooltip ativo
@@ -302,7 +302,7 @@ function hideTooltip() {
       }">
         <div class="flex items-start justify-between mb-6">
           <div>
-            <h2 class="text-lg font-medium text-gray-400 mb-2">Recomendacao</h2>
+            <h2 class="text-lg font-medium text-gray-400 mb-2">Recomendação</h2>
             <div class="flex items-center gap-4">
               <span :class="['badge text-lg px-4 py-2', getRecommendationBadgeClass(analysis.recommendation_type)]">
                 {{ analysis.recommendation }}
@@ -380,7 +380,7 @@ function hideTooltip() {
         </div>
         <div class="card relative group" @mouseenter="showTooltip('maxima')" @mouseleave="hideTooltip()">
           <p class="text-sm text-gray-500 flex items-center gap-1">
-            Maxima
+            Máxima
             <svg class="w-3.5 h-3.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
             </svg>
@@ -393,7 +393,7 @@ function hideTooltip() {
         </div>
         <div class="card relative group" @mouseenter="showTooltip('minima')" @mouseleave="hideTooltip()">
           <p class="text-sm text-gray-500 flex items-center gap-1">
-            Minima
+            Mínima
             <svg class="w-3.5 h-3.5 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
             </svg>
@@ -463,7 +463,7 @@ function hideTooltip() {
             {{ quote?.pe_ratio?.toFixed(1) || '--' }}
           </p>
           <p class="text-xs text-gray-500 mt-1">
-            {{ quote?.pe_ratio < 15 ? 'Barato' : quote?.pe_ratio > 25 ? 'Caro' : 'Razoavel' }}
+            {{ quote?.pe_ratio < 15 ? 'Barato' : quote?.pe_ratio > 25 ? 'Caro' : 'Razoável' }}
           </p>
           <div v-show="activeTooltip === 'pl'" class="absolute z-30 bottom-full left-0 mb-2 w-72 p-3 bg-gray-900 border border-gray-700 rounded-lg shadow-xl text-xs text-gray-300 leading-relaxed">
             {{ tooltips.pl }}
@@ -519,7 +519,7 @@ function hideTooltip() {
       <!-- Price Position Bar -->
       <div v-if="quote?.fifty_two_week_low && quote?.fifty_two_week_high" class="card mb-8 relative">
         <h3 class="text-lg font-semibold mb-4 text-white flex items-center gap-2 group" @mouseenter="showTooltip('range52')" @mouseleave="hideTooltip()">
-          Posicao no Range de 52 Semanas
+          Posição no Range de 52 Semanas
           <svg class="w-4 h-4 text-gray-600 opacity-0 group-hover:opacity-100 transition-opacity cursor-help" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
           </svg>
@@ -548,9 +548,9 @@ function hideTooltip() {
         </p>
       </div>
 
-      <!-- Resumo Rapido -->
+      <!-- Resumo Rápido -->
       <div class="card mb-8 border border-gray-700">
-        <h3 class="text-lg font-semibold mb-4 text-white">Resumo Rapido</h3>
+        <h3 class="text-lg font-semibold mb-4 text-white">Resumo Rápido</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div class="p-4 rounded-lg" :class="{
             'bg-emerald-500/10 border border-emerald-500/20': quote?.pe_ratio && quote.pe_ratio < 15,
@@ -560,7 +560,7 @@ function hideTooltip() {
           }">
             <p class="text-sm text-gray-400">Valuation (P/L)</p>
             <p class="text-lg font-bold text-white">
-              {{ !quote?.pe_ratio ? 'Sem dados' : quote.pe_ratio < 15 ? 'Atrativo' : quote.pe_ratio > 25 ? 'Caro' : 'Justo' }}
+              {{ !quote?.pe_ratio ? 'Sem dados' : quote.pe_ratio < 15 ? 'Atrativo' : quote.pe_ratio > 25 ? 'Caro' : 'Razoável' }}
             </p>
           </div>
           <div class="p-4 rounded-lg" :class="{
@@ -574,7 +574,7 @@ function hideTooltip() {
             </p>
           </div>
           <div class="p-4 rounded-lg bg-gray-700/50">
-            <p class="text-sm text-gray-400">Posicao no Mercado</p>
+            <p class="text-sm text-gray-400">Posição no Mercado</p>
             <p class="text-lg font-bold text-white">
               {{ quote?.market_cap > 50000000000 ? 'Large Cap' : quote?.market_cap > 10000000000 ? 'Mid Cap' : 'Small Cap' }}
             </p>
@@ -582,10 +582,10 @@ function hideTooltip() {
         </div>
       </div>
 
-      <!-- Grafico de Historico -->
+      <!-- Gráfico de Histórico -->
       <div class="card mb-8">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-white">Historico de Precos</h3>
+          <h3 class="text-lg font-semibold text-white">Histórico de Preços</h3>
           <div class="flex gap-2">
             <button
               v-for="p in periods"
@@ -694,9 +694,9 @@ function hideTooltip() {
             <div class="mt-2 pt-2 border-t border-gray-700 grid grid-cols-2 gap-x-4 gap-y-1 text-xs">
               <span class="text-gray-500">Abertura</span>
               <span class="text-gray-300 text-right">{{ formatPrice(hoveredData.open) }}</span>
-              <span class="text-gray-500">Maxima</span>
+              <span class="text-gray-500">Máxima</span>
               <span class="text-emerald-400 text-right">{{ formatPrice(hoveredData.high) }}</span>
-              <span class="text-gray-500">Minima</span>
+              <span class="text-gray-500">Mínima</span>
               <span class="text-red-400 text-right">{{ formatPrice(hoveredData.low) }}</span>
               <span class="text-gray-500">Volume</span>
               <span class="text-gray-300 text-right">{{ formatVolume(hoveredData.volume) }}</span>
@@ -716,16 +716,16 @@ function hideTooltip() {
         </div>
 
         <div v-else class="h-64 flex items-center justify-center text-gray-500">
-          Sem dados de historico disponiveis
+          Sem dados de histórico disponíveis
         </div>
       </div>
 
-      <!-- Ultimas Noticias -->
+      <!-- Últimas Notícias -->
       <div class="card">
         <div class="flex items-center justify-between mb-4">
-          <h3 class="text-lg font-semibold text-white">Noticias Relacionadas</h3>
+          <h3 class="text-lg font-semibold text-white">Notícias Relacionadas</h3>
           <span v-if="news.length && news[0]?.is_market_news" class="text-xs text-gray-500 bg-gray-700 px-2 py-1 rounded">
-            Noticias do mercado
+            Notícias do mercado
           </span>
         </div>
 
@@ -734,7 +734,7 @@ function hideTooltip() {
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Buscando noticias...
+          Buscando notícias...
         </div>
 
         <div v-else-if="news.length" class="space-y-4">
@@ -780,8 +780,8 @@ function hideTooltip() {
           <svg class="w-12 h-12 mx-auto text-gray-600 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
           </svg>
-          <p class="text-gray-500 text-sm">Nenhuma noticia encontrada para {{ stock?.ticker }}</p>
-          <p class="text-gray-600 text-xs mt-1">As noticias sao filtradas por mencoes da empresa</p>
+          <p class="text-gray-500 text-sm">Nenhuma notícia encontrada para {{ stock?.ticker }}</p>
+          <p class="text-gray-600 text-xs mt-1">As notícias são filtradas por menções da empresa</p>
         </div>
       </div>
     </div>

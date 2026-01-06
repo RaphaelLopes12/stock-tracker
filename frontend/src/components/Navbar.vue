@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 
 const navItems = [
   { name: 'Dashboard', path: '/' },
-  { name: 'Acoes', path: '/stocks' },
+  { name: 'Ações', path: '/stocks' },
   { name: 'Carteira', path: '/portfolio' },
   { name: 'Alertas', path: '/alerts' },
 ]
