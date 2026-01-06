@@ -19,6 +19,13 @@ const loadingNews = ref(false)
 const loading = ref(true)
 const error = ref<string | null>(null)
 
+// Price targets editing
+const editingTargets = ref(false)
+const savingTargets = ref(false)
+const editTargetBuy = ref<string>('')
+const editTargetSell = ref<string>('')
+const editNotes = ref<string>('')
+
 // Chart interactivity
 const chartContainer = ref<HTMLElement | null>(null)
 const hoveredIndex = ref<number | null>(null)
@@ -259,6 +266,65 @@ function getPlSummaryLabel(peRatio: number | null | undefined): string {
   if (peRatio > 25) return t('stockDetail.expensive')
   return t('stockDetail.fair')
 }
+
+// Price targets functions
+function startEditingTargets() {
+  editTargetBuy.value = stock.value?.target_buy_price?.toString() || ''
+  editTargetSell.value = stock.value?.target_sell_price?.toString() || ''
+  editNotes.value = stock.value?.notes || ''
+  editingTargets.value = true
+}
+
+function cancelEditingTargets() {
+  editingTargets.value = false
+}
+
+async function saveTargets() {
+  savingTargets.value = true
+  try {
+    const data: any = {
+      target_buy_price: editTargetBuy.value ? parseFloat(editTargetBuy.value) : null,
+      target_sell_price: editTargetSell.value ? parseFloat(editTargetSell.value) : null,
+      notes: editNotes.value || null,
+    }
+    const response = await stockApi.update(ticker, data)
+    stock.value = response.data
+    editingTargets.value = false
+  } catch (e) {
+    console.error('Error saving targets:', e)
+  } finally {
+    savingTargets.value = false
+  }
+}
+
+// Computed for price target analysis
+const buyTargetAnalysis = computed(() => {
+  if (!stock.value?.target_buy_price || !quote.value?.price) return null
+  const target = parseFloat(stock.value.target_buy_price)
+  const current = quote.value.price
+  const diff = ((current - target) / target) * 100
+  return {
+    target,
+    diff: Math.abs(diff).toFixed(1),
+    isBelow: current < target,
+    isAbove: current > target,
+    isGood: current <= target,
+  }
+})
+
+const sellTargetAnalysis = computed(() => {
+  if (!stock.value?.target_sell_price || !quote.value?.price) return null
+  const target = parseFloat(stock.value.target_sell_price)
+  const current = quote.value.price
+  const diff = ((current - target) / target) * 100
+  return {
+    target,
+    diff: Math.abs(diff).toFixed(1),
+    isBelow: current < target,
+    isAbove: current > target,
+    isGood: current >= target,
+  }
+})
 </script>
 
 <template>
@@ -308,6 +374,114 @@ function getPlSummaryLabel(peRatio: number | null | undefined): string {
           </div>
         </div>
       </header>
+
+      <!-- Price Targets & Notes Card -->
+      <div class="card mb-8 border border-gray-700">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-semibold text-white">{{ t('stockDetail.priceTargets') }}</h3>
+          <button
+            v-if="!editingTargets"
+            @click="startEditingTargets"
+            class="text-sm text-primary-400 hover:text-primary-300 transition-colors"
+          >
+            {{ t('stockDetail.editTargets') }}
+          </button>
+        </div>
+
+        <!-- View Mode -->
+        <div v-if="!editingTargets">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <!-- Buy Target -->
+            <div class="p-4 rounded-lg" :class="buyTargetAnalysis?.isGood ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-gray-700/50'">
+              <p class="text-sm text-gray-400 mb-1">{{ t('stockDetail.targetBuyPrice') }}</p>
+              <p class="text-2xl font-bold" :class="buyTargetAnalysis?.isGood ? 'text-emerald-400' : 'text-white'">
+                {{ stock.target_buy_price ? formatPrice(parseFloat(stock.target_buy_price)) : t('stockDetail.notDefined') }}
+              </p>
+              <div v-if="buyTargetAnalysis" class="mt-2">
+                <span v-if="buyTargetAnalysis.isGood" class="text-emerald-400 text-sm font-medium">
+                  {{ t('stockDetail.goodToBuy') }}
+                </span>
+                <span v-else-if="buyTargetAnalysis.isAbove" class="text-gray-400 text-sm">
+                  {{ t('stockDetail.aboveTarget', { percent: buyTargetAnalysis.diff }) }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Sell Target -->
+            <div class="p-4 rounded-lg" :class="sellTargetAnalysis?.isGood ? 'bg-emerald-500/10 border border-emerald-500/30' : 'bg-gray-700/50'">
+              <p class="text-sm text-gray-400 mb-1">{{ t('stockDetail.targetSellPrice') }}</p>
+              <p class="text-2xl font-bold" :class="sellTargetAnalysis?.isGood ? 'text-emerald-400' : 'text-white'">
+                {{ stock.target_sell_price ? formatPrice(parseFloat(stock.target_sell_price)) : t('stockDetail.notDefined') }}
+              </p>
+              <div v-if="sellTargetAnalysis" class="mt-2">
+                <span v-if="sellTargetAnalysis.isGood" class="text-emerald-400 text-sm font-medium">
+                  {{ t('stockDetail.goodToSell') }}
+                </span>
+                <span v-else-if="sellTargetAnalysis.isBelow" class="text-gray-400 text-sm">
+                  {{ t('stockDetail.belowTarget', { percent: sellTargetAnalysis.diff }) }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notes -->
+          <div class="border-t border-gray-700 pt-4">
+            <p class="text-sm text-gray-400 mb-2">{{ t('stockDetail.investmentNotes') }}</p>
+            <p v-if="stock.notes" class="text-gray-300 whitespace-pre-wrap">{{ stock.notes }}</p>
+            <p v-else class="text-gray-500 italic">{{ t('stockDetail.noNotes') }}</p>
+          </div>
+        </div>
+
+        <!-- Edit Mode -->
+        <div v-else>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">{{ t('stockDetail.targetBuyPrice') }}</label>
+              <input
+                v-model="editTargetBuy"
+                type="number"
+                step="0.01"
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-primary-500 focus:outline-none"
+                placeholder="0.00"
+              />
+            </div>
+            <div>
+              <label class="block text-sm text-gray-400 mb-1">{{ t('stockDetail.targetSellPrice') }}</label>
+              <input
+                v-model="editTargetSell"
+                type="number"
+                step="0.01"
+                class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-primary-500 focus:outline-none"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="block text-sm text-gray-400 mb-1">{{ t('stockDetail.investmentNotes') }}</label>
+            <textarea
+              v-model="editNotes"
+              rows="3"
+              class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:border-primary-500 focus:outline-none resize-none"
+              :placeholder="t('stockDetail.notesPlaceholder')"
+            ></textarea>
+          </div>
+          <div class="flex justify-end gap-3">
+            <button
+              @click="cancelEditingTargets"
+              class="px-4 py-2 text-gray-400 hover:text-white transition-colors"
+            >
+              {{ t('common.cancel') }}
+            </button>
+            <button
+              @click="saveTargets"
+              :disabled="savingTargets"
+              class="px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors disabled:opacity-50"
+            >
+              {{ savingTargets ? t('stockDetail.saving') : t('stockDetail.saveTargets') }}
+            </button>
+          </div>
+        </div>
+      </div>
 
       <!-- Analysis Card - Destaque Visual -->
       <div v-if="analysis" class="card mb-8" :class="{

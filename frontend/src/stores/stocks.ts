@@ -9,6 +9,9 @@ export interface Stock {
   sector: string | null
   subsector: string | null
   is_active: boolean
+  target_buy_price: number | null
+  target_sell_price: number | null
+  notes: string | null
   created_at: string
   updated_at: string
 }
@@ -61,6 +64,31 @@ export const useStocksStore = defineStore('stocks', () => {
     }
   }
 
+  async function updateStock(ticker: string, data: {
+    name?: string
+    sector?: string
+    is_active?: boolean
+    target_buy_price?: number | null
+    target_sell_price?: number | null
+    notes?: string | null
+  }) {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await stockApi.update(ticker, data)
+      const index = stocks.value.findIndex((s) => s.ticker === ticker)
+      if (index !== -1) {
+        stocks.value[index] = response.data
+      }
+      return response.data
+    } catch (e) {
+      error.value = 'Erro ao atualizar ação'
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
   return {
     stocks,
     loading,
@@ -68,5 +96,6 @@ export const useStocksStore = defineStore('stocks', () => {
     fetchStocks,
     addStock,
     removeStock,
+    updateStock,
   }
 })

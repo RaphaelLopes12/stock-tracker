@@ -1,4 +1,5 @@
 from datetime import datetime
+from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
 
@@ -19,6 +20,9 @@ class StockUpdate(BaseModel):
     sector: str | None = None
     subsector: str | None = None
     is_active: bool | None = None
+    target_buy_price: Decimal | None = None
+    target_sell_price: Decimal | None = None
+    notes: str | None = None
 
 
 class StockResponse(StockBase):
@@ -26,6 +30,9 @@ class StockResponse(StockBase):
 
     id: int
     is_active: bool
+    target_buy_price: Decimal | None = None
+    target_sell_price: Decimal | None = None
+    notes: str | None = None
     created_at: datetime
     updated_at: datetime
 

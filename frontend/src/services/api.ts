@@ -40,8 +40,14 @@ export const stockApi = {
   list: (activeOnly = true) => api.get('/stocks', { params: { active_only: activeOnly } }),
   get: (ticker: string) => api.get(`/stocks/${ticker}`),
   create: (data: { ticker: string; name: string; sector?: string }) => api.post('/stocks', data),
-  update: (ticker: string, data: Partial<{ name: string; sector: string; is_active: boolean }>) =>
-    api.patch(`/stocks/${ticker}`, data),
+  update: (ticker: string, data: Partial<{
+    name: string
+    sector: string
+    is_active: boolean
+    target_buy_price: number | null
+    target_sell_price: number | null
+    notes: string | null
+  }>) => api.patch(`/stocks/${ticker}`, data),
   delete: (ticker: string) => api.delete(`/stocks/${ticker}`),
 }
 
