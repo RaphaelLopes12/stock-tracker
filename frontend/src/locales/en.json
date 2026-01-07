@@ -183,7 +183,18 @@
     "confirmDeleteTransaction": "Are you sure you want to remove this transaction? The portfolio will be recalculated.",
     "removeTransaction": "Remove transaction",
     "downloadCsvTemplate": "Download CSV template",
-    "importAnother": "Import another"
+    "importAnother": "Import another",
+    "benchmark": "Benchmark",
+    "benchmarkTitle": "Performance vs Benchmarks",
+    "benchmarkSubtitle": "Compare your returns with CDI and Ibovespa",
+    "yourPortfolio": "Your Portfolio",
+    "vsBenchmark": "vs {benchmark}",
+    "beatingBenchmark": "Beating",
+    "losingToBenchmark": "Below",
+    "bestInvestment": "Best investment in period",
+    "annualRate": "Annual rate",
+    "periodDays": "Period: {days} days",
+    "loadingBenchmark": "Loading benchmark..."
   },
   "addTransaction": {
     "title": "New Transaction",
@@ -265,5 +276,20 @@
     "ptBR": "Português",
     "en": "English",
     "es": "Español"
+  },
+  "notifications": {
+    "title": "Push Notifications",
+    "subtitle": "Get alerts even when the app is closed",
+    "notSupported": "Browser not supported",
+    "blocked": "Notifications blocked",
+    "prefsTitle": "What do you want to receive?",
+    "priceAlerts": "Price alerts",
+    "dividends": "Dividend announcements",
+    "news": "Relevant news",
+    "hint": "Enable to receive price and dividend alerts directly on your device",
+    "sendTest": "Send test notification",
+    "testing": "Sending...",
+    "testSent": "Notification sent! Check your device.",
+    "testFailed": "Failed to send. Check permissions."
   }
 }

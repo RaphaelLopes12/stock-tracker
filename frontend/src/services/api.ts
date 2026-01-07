@@ -181,6 +181,33 @@ export interface ImportResult {
   created_stocks: string[]
 }
 
+export interface BenchmarkComparison {
+  period: {
+    start: string | null
+    end: string | null
+    days: number
+  }
+  portfolio: {
+    return: number
+  }
+  benchmarks: {
+    ibovespa: {
+      return: number | null
+      vs_portfolio: number | null
+      beats: boolean | null
+    }
+    cdi: {
+      return: number | null
+      vs_portfolio: number | null
+      beats: boolean | null
+      annual_rate: number | null
+    }
+  }
+  summary: {
+    best_investment: string
+  }
+}
+
 export const portfolioApi = {
   get: () => api.get<PortfolioResponse>('/portfolio'),
   getHoldings: () => api.get<PortfolioHolding[]>('/portfolio/holdings'),
@@ -190,6 +217,8 @@ export const portfolioApi = {
   addTransaction: (data: TransactionCreate) => api.post<Transaction>('/portfolio/transaction', data),
   deleteTransaction: (id: number) => api.delete(`/portfolio/transaction/${id}`),
   getHolding: (id: number) => api.get<PortfolioHolding>(`/portfolio/${id}`),
+  getBenchmark: (periodDays = 365) =>
+    api.get<BenchmarkComparison>('/portfolio/benchmark', { params: { period_days: periodDays } }),
   importCsv: (file: File, skipDuplicates = true, createMissingStocks = true) => {
     const formData = new FormData()
     formData.append('file', file)
@@ -199,4 +228,39 @@ export const portfolioApi = {
     })
   },
   getImportTemplate: () => api.get('/portfolio/import/template', { responseType: 'blob' }),
+}
+
+export interface PushSubscriptionCreate {
+  endpoint: string
+  keys: {
+    p256dh: string
+    auth: string
+  }
+}
+
+export interface PushPreferences {
+  notify_price_alerts?: boolean
+  notify_dividends?: boolean
+  notify_news?: boolean
+}
+
+export interface PushSubscriptionResponse {
+  id: number
+  endpoint: string
+  is_active: boolean
+  notify_price_alerts: boolean
+  notify_dividends: boolean
+  notify_news: boolean
+  created_at: string
+  last_used_at: string | null
+}
+
+export const notificationsApi = {
+  getVapidKey: () => api.get<{ public_key: string }>('/notifications/vapid-key'),
+  subscribe: (data: PushSubscriptionCreate) => api.post<PushSubscriptionResponse>('/notifications/subscribe', data),
+  unsubscribe: (endpoint: string) => api.post('/notifications/unsubscribe', null, { params: { endpoint } }),
+  getSubscription: (endpoint: string) => api.get<PushSubscriptionResponse>('/notifications/subscription', { params: { endpoint } }),
+  updatePreferences: (endpoint: string, prefs: PushPreferences) =>
+    api.patch<PushSubscriptionResponse>('/notifications/preferences', prefs, { params: { endpoint } }),
+  sendTest: () => api.post<{ sent: number; failed: number }>('/notifications/test'),
 }

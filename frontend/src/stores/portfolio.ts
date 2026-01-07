@@ -6,6 +6,7 @@ import {
   type PortfolioSummary,
   type Transaction,
   type TransactionCreate,
+  type BenchmarkComparison,
 } from '@/services/api'
 
 export const usePortfolioStore = defineStore('portfolio', () => {
@@ -13,7 +14,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
   const holdings = ref<PortfolioHolding[]>([])
   const summary = ref<PortfolioSummary | null>(null)
   const transactions = ref<Transaction[]>([])
+  const benchmark = ref<BenchmarkComparison | null>(null)
   const loading = ref(false)
+  const loadingBenchmark = ref(false)
   const error = ref<string | null>(null)
 
   // Computed
@@ -97,6 +100,18 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     }
   }
 
+  async function fetchBenchmark(periodDays = 365) {
+    loadingBenchmark.value = true
+    try {
+      const response = await portfolioApi.getBenchmark(periodDays)
+      benchmark.value = response.data
+    } catch (e: any) {
+      console.error('Erro ao carregar benchmark:', e)
+    } finally {
+      loadingBenchmark.value = false
+    }
+  }
+
   function clearError() {
     error.value = null
   }
@@ -106,7 +121,9 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     holdings,
     summary,
     transactions,
+    benchmark,
     loading,
+    loadingBenchmark,
     error,
     // Computed
     hasHoldings,
@@ -119,6 +136,7 @@ export const usePortfolioStore = defineStore('portfolio', () => {
     fetchTransactions,
     addTransaction,
     deleteTransaction,
+    fetchBenchmark,
     clearError,
   }
 })

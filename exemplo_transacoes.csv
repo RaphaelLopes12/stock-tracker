@@ -1,0 +1,14 @@
+data,ticker,tipo,quantidade,preco,taxas,observacoes
+2024-01-15,WEGE3,compra,100,35.50,0,Primeira compra - empresa industrial
+2024-01-20,PETR4,compra,200,28.75,4.90,Petroleo em baixa
+2024-02-10,ITUB4,compra,150,22.30,0,Banco solido
+2024-02-25,WEGE3,compra,50,33.80,0,Aproveitando queda
+2024-03-05,VALE3,compra,80,62.40,3.50,Mineracao
+2024-03-15,BBDC4,compra,120,14.25,0,Bradesco
+2024-04-01,PETR4,compra,100,31.20,0,Aumentando posicao
+2024-04-20,WEGE3,venda,30,38.50,0,Realizando lucro parcial
+2024-05-10,ABEV3,compra,200,12.80,0,Ambev - dividendos
+2024-06-01,ITUB4,compra,100,24.50,0,Aumentando posicao banco
+2024-06-15,VALE3,venda,30,68.90,2.00,Venda parcial com lucro
+2024-07-01,MGLU3,compra,300,8.50,0,Aposta em recuperacao
+2024-08-10,PETR4,venda,50,35.00,0,Realizando parte do lucro

@@ -27,6 +27,11 @@ class Settings(BaseSettings):
     telegram_bot_token: str | None = None
     telegram_chat_id: str | None = None
 
+    # Web Push (VAPID)
+    vapid_public_key: str | None = None
+    vapid_private_key: str | None = None
+    vapid_subject: str = "mailto:admin@stocktracker.local"
+
     # AI Features
     ai_enabled: bool = False
 

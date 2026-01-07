@@ -183,7 +183,18 @@
     "confirmDeleteTransaction": "¿Estás seguro de que deseas eliminar esta transacción? La cartera será recalculada.",
     "removeTransaction": "Eliminar transacción",
     "downloadCsvTemplate": "Descargar plantilla CSV",
-    "importAnother": "Importar otro"
+    "importAnother": "Importar otro",
+    "benchmark": "Comparativo",
+    "benchmarkTitle": "Rendimiento vs Benchmarks",
+    "benchmarkSubtitle": "Compara tu retorno con CDI e Ibovespa",
+    "yourPortfolio": "Tu Cartera",
+    "vsBenchmark": "vs {benchmark}",
+    "beatingBenchmark": "Superando",
+    "losingToBenchmark": "Por debajo de",
+    "bestInvestment": "Mejor inversión en el período",
+    "annualRate": "Tasa anual",
+    "periodDays": "Período: {days} días",
+    "loadingBenchmark": "Cargando comparativo..."
   },
   "addTransaction": {
     "title": "Nueva Transacción",
@@ -265,5 +276,20 @@
     "ptBR": "Português",
     "en": "English",
     "es": "Español"
+  },
+  "notifications": {
+    "title": "Notificaciones Push",
+    "subtitle": "Recibe alertas incluso con la app cerrada",
+    "notSupported": "Navegador no soportado",
+    "blocked": "Notificaciones bloqueadas",
+    "prefsTitle": "¿Qué quieres recibir?",
+    "priceAlerts": "Alertas de precio",
+    "dividends": "Dividendos anunciados",
+    "news": "Noticias relevantes",
+    "hint": "Activa para recibir alertas de precio y dividendos directamente en tu dispositivo",
+    "sendTest": "Enviar notificacion de prueba",
+    "testing": "Enviando...",
+    "testSent": "Notificacion enviada! Verifica tu dispositivo.",
+    "testFailed": "Error al enviar. Verifica los permisos."
   }
 }

@@ -97,3 +97,34 @@ class ImportResultResponse(BaseModel):
     errors: list[str] = Field(default=[], description="Lista de erros encontrados")
     warnings: list[str] = Field(default=[], description="Avisos e informações")
     created_stocks: list[str] = Field(default=[], description="Ações criadas automaticamente")
+
+
+# ============ Benchmark Schemas ============
+
+
+class BenchmarkPeriod(BaseModel):
+    """Período de comparação."""
+
+    start: str = Field(description="Data inicial (YYYY-MM-DD)")
+    end: str = Field(description="Data final (YYYY-MM-DD)")
+    days: int = Field(description="Número de dias no período")
+
+
+class BenchmarkInfo(BaseModel):
+    """Informações de um benchmark."""
+
+    return_percent: Optional[float] = Field(alias="return", description="Retorno percentual no período")
+    vs_portfolio: Optional[float] = Field(description="Diferença em pontos percentuais vs portfolio")
+    beats: Optional[bool] = Field(description="Se o portfolio bateu este benchmark")
+    annual_rate: Optional[float] = Field(default=None, description="Taxa anual (apenas CDI)")
+
+
+class BenchmarkComparison(BaseModel):
+    """Schema de comparação com benchmarks."""
+
+    model_config = ConfigDict(populate_by_name=True)
+
+    period: BenchmarkPeriod
+    portfolio: dict = Field(description="Retorno do portfolio")
+    benchmarks: dict = Field(description="Dados dos benchmarks (ibovespa, cdi)")
+    summary: dict = Field(description="Resumo da comparação")

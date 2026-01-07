@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { alertsApi, stockApi, type Alert, type AlertCreate } from '@/services/api'
+import NotificationSettings from '@/components/NotificationSettings.vue'
 
 const { t } = useI18n()
 
@@ -183,6 +184,9 @@ onMounted(loadData)
         {{ t('alerts.newAlert') }}
       </button>
     </header>
+
+    <!-- Notificações Push -->
+    <NotificationSettings class="mb-6" />
 
     <!-- Dica educativa -->
     <div class="card mb-6 bg-blue-500/10 border border-blue-500/20">

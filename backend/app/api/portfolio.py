@@ -23,6 +23,7 @@ from app.services.portfolio_service import (
     recalculate_portfolio_from_transactions,
 )
 from app.services.import_service import import_csv, get_csv_template
+from app.services.benchmark_service import get_benchmark_comparison
 
 router = APIRouter(prefix="/portfolio", tags=["portfolio"])
 
@@ -237,6 +238,52 @@ async def get_import_template():
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=template_transacoes.csv"}
     )
+
+
+@router.get("/benchmark")
+async def get_portfolio_benchmark(
+    period_days: int = 365,
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Compara a performance do portfolio com benchmarks (CDI e Ibovespa).
+
+    Args:
+        period_days: Número de dias do período de comparação (padrão: 365 = 1 ano)
+
+    Returns:
+        Comparação de retorno do portfolio vs CDI e Ibovespa
+    """
+    # Buscar dados do portfolio
+    holdings = await get_portfolio_with_quotes(db)
+    summary = calculate_portfolio_summary(holdings)
+
+    # Calcular retorno do portfolio
+    portfolio_return = summary.total_gain_loss_percent
+
+    # Se não há posições, retornar comparação vazia
+    if not holdings:
+        return {
+            "period": {
+                "start": None,
+                "end": None,
+                "days": period_days,
+            },
+            "portfolio": {"return": 0},
+            "benchmarks": {
+                "ibovespa": {"return": None, "vs_portfolio": None, "beats": None},
+                "cdi": {"return": None, "vs_portfolio": None, "beats": None, "annual_rate": None},
+            },
+            "summary": {"best_investment": "portfolio"},
+        }
+
+    # Buscar comparação com benchmarks
+    comparison = await get_benchmark_comparison(
+        portfolio_return=portfolio_return,
+        period_days=period_days,
+    )
+
+    return comparison
 
 
 @router.get("/{holding_id}", response_model=PortfolioHolding)

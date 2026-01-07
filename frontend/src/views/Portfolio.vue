@@ -44,10 +44,25 @@ const gainLossClass = (value: number | null) => {
   return 'text-gray-400'
 }
 
+// Benchmark state
+const showBenchmark = ref(false)
+
 // Load data
 onMounted(async () => {
   await Promise.all([store.fetchPortfolio(), store.fetchTransactions()])
+  // Load benchmark after portfolio
+  if (store.hasHoldings) {
+    store.fetchBenchmark()
+  }
 })
+
+// Toggle benchmark section
+const toggleBenchmark = () => {
+  showBenchmark.value = !showBenchmark.value
+  if (showBenchmark.value && !store.benchmark) {
+    store.fetchBenchmark()
+  }
+}
 
 // Handle transaction added
 const handleTransactionAdded = () => {
@@ -188,6 +203,129 @@ const deleteTransaction = async (id: number) => {
               ({{ formatPercent(store.summary?.total_gain_loss_percent ?? 0) }})
             </span>
           </p>
+        </div>
+      </div>
+
+      <!-- Benchmark Comparison Section -->
+      <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 overflow-hidden mb-6">
+        <button
+          @click="toggleBenchmark"
+          class="w-full p-4 flex items-center justify-between text-left hover:bg-gray-700/30 transition-colors"
+        >
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-indigo-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white">{{ t('portfolio.benchmarkTitle') }}</h3>
+              <p class="text-xs text-gray-400">{{ t('portfolio.benchmarkSubtitle') }}</p>
+            </div>
+          </div>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5 text-gray-400 transition-transform"
+            :class="{ 'rotate-180': showBenchmark }"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+          >
+            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+
+        <div v-if="showBenchmark" class="border-t border-gray-700/50 p-4">
+          <!-- Loading -->
+          <div v-if="store.loadingBenchmark" class="text-center py-4 text-gray-400">
+            <svg class="animate-spin h-6 w-6 mx-auto mb-2 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ t('portfolio.loadingBenchmark') }}
+          </div>
+
+          <!-- Benchmark Content -->
+          <div v-else-if="store.benchmark" class="space-y-4">
+            <!-- Period Info -->
+            <div class="text-xs text-gray-400 text-center">
+              {{ t('portfolio.periodDays', { days: store.benchmark.period.days }) }}
+            </div>
+
+            <!-- Comparison Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <!-- Portfolio -->
+              <div class="bg-gray-900/50 rounded-lg p-4 text-center border border-gray-700/30">
+                <p class="text-xs text-gray-400 mb-1">{{ t('portfolio.yourPortfolio') }}</p>
+                <p class="text-2xl font-bold" :class="gainLossClass(store.benchmark.portfolio.return)">
+                  {{ formatPercent(store.benchmark.portfolio.return) }}
+                </p>
+              </div>
+
+              <!-- Ibovespa -->
+              <div class="bg-gray-900/50 rounded-lg p-4 text-center border border-gray-700/30">
+                <p class="text-xs text-gray-400 mb-1">Ibovespa</p>
+                <p class="text-2xl font-bold" :class="gainLossClass(store.benchmark.benchmarks.ibovespa.return)">
+                  {{ store.benchmark.benchmarks.ibovespa.return !== null ? formatPercent(store.benchmark.benchmarks.ibovespa.return) : '--' }}
+                </p>
+                <p
+                  v-if="store.benchmark.benchmarks.ibovespa.vs_portfolio !== null"
+                  class="text-xs mt-1"
+                  :class="store.benchmark.benchmarks.ibovespa.beats ? 'text-red-400' : 'text-emerald-400'"
+                >
+                  {{ store.benchmark.benchmarks.ibovespa.beats ? t('portfolio.losingToBenchmark') : t('portfolio.beatingBenchmark') }}
+                  ({{ formatPercent(Math.abs(store.benchmark.benchmarks.ibovespa.vs_portfolio)) }})
+                </p>
+              </div>
+
+              <!-- CDI -->
+              <div class="bg-gray-900/50 rounded-lg p-4 text-center border border-gray-700/30">
+                <p class="text-xs text-gray-400 mb-1">CDI</p>
+                <p class="text-2xl font-bold" :class="gainLossClass(store.benchmark.benchmarks.cdi.return)">
+                  {{ store.benchmark.benchmarks.cdi.return !== null ? formatPercent(store.benchmark.benchmarks.cdi.return) : '--' }}
+                </p>
+                <p
+                  v-if="store.benchmark.benchmarks.cdi.vs_portfolio !== null"
+                  class="text-xs mt-1"
+                  :class="store.benchmark.benchmarks.cdi.beats ? 'text-red-400' : 'text-emerald-400'"
+                >
+                  {{ store.benchmark.benchmarks.cdi.beats ? t('portfolio.losingToBenchmark') : t('portfolio.beatingBenchmark') }}
+                  ({{ formatPercent(Math.abs(store.benchmark.benchmarks.cdi.vs_portfolio)) }})
+                </p>
+                <p v-if="store.benchmark.benchmarks.cdi.annual_rate" class="text-xs text-gray-500 mt-1">
+                  {{ t('portfolio.annualRate') }}: {{ store.benchmark.benchmarks.cdi.annual_rate }}%
+                </p>
+              </div>
+            </div>
+
+            <!-- Best Investment Summary -->
+            <div
+              v-if="store.benchmark.summary.best_investment"
+              class="text-center py-3 rounded-lg"
+              :class="{
+                'bg-emerald-500/10 border border-emerald-500/20': store.benchmark.summary.best_investment === 'portfolio',
+                'bg-yellow-500/10 border border-yellow-500/20': store.benchmark.summary.best_investment !== 'portfolio'
+              }"
+            >
+              <p class="text-sm">
+                <span class="text-gray-400">{{ t('portfolio.bestInvestment') }}:</span>
+                <span
+                  class="font-semibold ml-1"
+                  :class="{
+                    'text-emerald-400': store.benchmark.summary.best_investment === 'portfolio',
+                    'text-yellow-400': store.benchmark.summary.best_investment !== 'portfolio'
+                  }"
+                >
+                  {{
+                    store.benchmark.summary.best_investment === 'portfolio'
+                      ? t('portfolio.yourPortfolio')
+                      : store.benchmark.summary.best_investment === 'ibovespa'
+                        ? 'Ibovespa'
+                        : 'CDI'
+                  }}
+                </span>
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

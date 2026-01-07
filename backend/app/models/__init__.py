@@ -3,6 +3,7 @@ from app.models.dividend import Dividend
 from app.models.fundamental import Fundamental
 from app.models.news import News, NewsStock, RelevantFact
 from app.models.portfolio import Portfolio, Transaction
+from app.models.push_subscription import PushSubscription
 from app.models.quote import Quote
 from app.models.stock import Stock
 
@@ -18,4 +19,5 @@ __all__ = [
     "AlertHistory",
     "Portfolio",
     "Transaction",
+    "PushSubscription",
 ]
