@@ -74,7 +74,7 @@ async function subscribe(): Promise<boolean> {
     const registration = await navigator.serviceWorker.ready
     const pushSubscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(vapidKey.value),
+      applicationServerKey: urlBase64ToUint8Array(vapidKey.value) as BufferSource,
     })
 
     const p256dh = pushSubscription.getKey('p256dh')

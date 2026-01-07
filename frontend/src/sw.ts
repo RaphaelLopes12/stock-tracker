@@ -47,7 +47,7 @@ self.addEventListener('push', (event: PushEvent) => {
   try {
     const payload: PushPayload = event.data.json()
 
-    const options: NotificationOptions = {
+    const options = {
       body: payload.body,
       icon: payload.icon || '/pwa-192x192.png',
       badge: payload.badge || '/pwa-192x192.png',
@@ -56,7 +56,7 @@ self.addEventListener('push', (event: PushEvent) => {
       actions: payload.actions,
       requireInteraction: payload.require_interaction || false,
       vibrate: [200, 100, 200],
-    }
+    } as NotificationOptions
 
     event.waitUntil(self.registration.showNotification(payload.title, options))
   } catch {
