@@ -2,9 +2,11 @@
 import { ref, onMounted, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { alertsApi, stockApi, type Alert, type AlertCreate } from '@/services/api'
+import { useConfirm } from '@/composables/useConfirm'
 import NotificationSettings from '@/components/NotificationSettings.vue'
 
 const { t } = useI18n()
+const { confirm } = useConfirm()
 
 // Estado
 const alerts = ref<Alert[]>([])
@@ -105,7 +107,12 @@ async function toggleAlert(alert: Alert) {
 
 // Deletar alerta
 async function deleteAlert(alert: Alert) {
-  if (!confirm(t('alerts.confirmRemove', { name: alert.name }))) return
+  const confirmed = await confirm({
+    title: t('common.confirm'),
+    message: t('alerts.confirmRemove', { name: alert.name }),
+    dangerous: true,
+  })
+  if (!confirmed) return
 
   try {
     await alertsApi.delete(alert.id)

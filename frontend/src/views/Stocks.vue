@@ -2,9 +2,11 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStocksStore } from '@/stores/stocks'
+import { useConfirm } from '@/composables/useConfirm'
 
 const { t } = useI18n()
 const stocksStore = useStocksStore()
+const { confirm } = useConfirm()
 
 const showAddModal = ref(false)
 const newStock = ref({ ticker: '', name: '', sector: '' })
@@ -34,7 +36,12 @@ async function handleAddStock() {
 }
 
 async function handleRemoveStock(ticker: string) {
-  if (confirm(t('stocks.confirmRemove', { ticker }))) {
+  const confirmed = await confirm({
+    title: t('common.confirm'),
+    message: t('stocks.confirmRemove', { ticker }),
+    dangerous: true,
+  })
+  if (confirmed) {
     await stocksStore.removeStock(ticker)
   }
 }

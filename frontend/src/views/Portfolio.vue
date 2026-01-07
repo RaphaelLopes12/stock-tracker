@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { usePortfolioStore } from '@/stores/portfolio'
+import { useConfirm } from '@/composables/useConfirm'
 import { dividendsApi, type ReceivedDividend, type DividendsSummary } from '@/services/api'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import ImportTransactionsModal from '@/components/ImportTransactionsModal.vue'
@@ -9,6 +10,7 @@ import AddDividendModal from '@/components/AddDividendModal.vue'
 
 const { t } = useI18n()
 const store = usePortfolioStore()
+const { confirm } = useConfirm()
 
 const showAddModal = ref(false)
 const showImportModal = ref(false)
@@ -88,7 +90,12 @@ const toggleTransactions = () => {
 
 // Delete transaction with confirmation
 const deleteTransaction = async (id: number) => {
-  if (confirm(t('portfolio.confirmDeleteTransaction'))) {
+  const confirmed = await confirm({
+    title: t('common.confirm'),
+    message: t('portfolio.confirmDeleteTransaction'),
+    dangerous: true,
+  })
+  if (confirmed) {
     await store.deleteTransaction(id)
   }
 }
@@ -123,7 +130,12 @@ const handleDividendAdded = async () => {
 }
 
 const deleteDividend = async (id: number) => {
-  if (confirm(t('dividends.confirmDelete'))) {
+  const confirmed = await confirm({
+    title: t('common.confirm'),
+    message: t('dividends.confirmDelete'),
+    dangerous: true,
+  })
+  if (confirmed) {
     try {
       await dividendsApi.delete(id)
       await fetchDividends()
