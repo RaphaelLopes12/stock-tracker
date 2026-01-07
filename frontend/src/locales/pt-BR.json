@@ -291,5 +291,31 @@
     "testing": "Enviando...",
     "testSent": "Notificação enviada! Verifique seu dispositivo.",
     "testFailed": "Falha ao enviar. Verifique as permissões."
+  },
+  "dividends": {
+    "title": "Dividendos Recebidos",
+    "subtitle": "Acompanhe os proventos que você recebeu",
+    "add": "+ Registrar",
+    "addTitle": "Registrar Dividendo",
+    "type": "Tipo",
+    "asset": "Ativo",
+    "assetPlaceholder": "Ex: WEGE3",
+    "totalAmount": "Valor Total (R$)",
+    "shares": "Qtd Ações",
+    "perShare": "Por Ação",
+    "paymentDate": "Data Pagamento",
+    "exDateOptional": "Data-com (opcional)",
+    "notesOptional": "Observações (opcional)",
+    "notesPlaceholder": "Observações sobre este provento",
+    "register": "Registrar",
+    "saving": "Salvando...",
+    "errorRegistering": "Erro ao registrar dividendo",
+    "loading": "Carregando dividendos...",
+    "noDividends": "Nenhum dividendo registrado",
+    "totalReceived": "Total Recebido",
+    "payments": "Pagamentos",
+    "total": "Total",
+    "remove": "Remover dividendo",
+    "confirmDelete": "Tem certeza que deseja remover este registro de dividendo?"
   }
 }

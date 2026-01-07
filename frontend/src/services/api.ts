@@ -264,3 +264,57 @@ export const notificationsApi = {
     api.patch<PushSubscriptionResponse>('/notifications/preferences', prefs, { params: { endpoint } }),
   sendTest: () => api.post<{ sent: number; failed: number }>('/notifications/test'),
 }
+
+export interface ReceivedDividendCreate {
+  ticker: string
+  type: 'dividendo' | 'jcp' | 'bonificacao'
+  amount: number
+  shares: number
+  payment_date: string
+  ex_date?: string
+  notes?: string
+}
+
+export interface ReceivedDividend {
+  id: number
+  stock_id: number
+  ticker: string
+  stock_name: string
+  type: string
+  amount: number
+  shares: number
+  per_share: number
+  payment_date: string
+  ex_date: string | null
+  notes: string | null
+  created_at: string
+}
+
+export interface DividendsByStock {
+  ticker: string
+  stock_name: string
+  total_amount: number
+  count: number
+}
+
+export interface DividendsByYear {
+  year: number
+  total_amount: number
+  count: number
+}
+
+export interface DividendsSummary {
+  total_amount: number
+  total_count: number
+  by_stock: DividendsByStock[]
+  by_year: DividendsByYear[]
+  by_type: Record<string, number>
+}
+
+export const dividendsApi = {
+  list: (limit = 50, ticker?: string, year?: number) =>
+    api.get<ReceivedDividend[]>('/dividends', { params: { limit, ticker, year } }),
+  create: (data: ReceivedDividendCreate) => api.post<ReceivedDividend>('/dividends', data),
+  delete: (id: number) => api.delete(`/dividends/${id}`),
+  getSummary: (year?: number) => api.get<DividendsSummary>('/dividends/summary', { params: { year } }),
+}

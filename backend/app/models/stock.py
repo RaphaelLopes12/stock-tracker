@@ -15,6 +15,7 @@ if TYPE_CHECKING:
     from app.models.fundamental import Fundamental
     from app.models.portfolio import Portfolio
     from app.models.quote import Quote
+    from app.models.received_dividend import ReceivedDividend
 
 
 class Stock(Base):
@@ -45,6 +46,7 @@ class Stock(Base):
     dividends: Mapped[list[Dividend]] = relationship(back_populates="stock")
     alerts: Mapped[list[Alert]] = relationship(back_populates="stock")
     portfolio_items: Mapped[list[Portfolio]] = relationship(back_populates="stock")
+    received_dividends: Mapped[list[ReceivedDividend]] = relationship(back_populates="stock")
 
     def __repr__(self) -> str:
         return f"<Stock {self.ticker}>"

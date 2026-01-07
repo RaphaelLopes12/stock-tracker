@@ -2,8 +2,10 @@
 import { ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { usePortfolioStore } from '@/stores/portfolio'
+import { dividendsApi, type ReceivedDividend, type DividendsSummary } from '@/services/api'
 import AddTransactionModal from '@/components/AddTransactionModal.vue'
 import ImportTransactionsModal from '@/components/ImportTransactionsModal.vue'
+import AddDividendModal from '@/components/AddDividendModal.vue'
 
 const { t } = useI18n()
 const store = usePortfolioStore()
@@ -11,6 +13,11 @@ const store = usePortfolioStore()
 const showAddModal = ref(false)
 const showImportModal = ref(false)
 const showTransactions = ref(false)
+const showAddDividendModal = ref(false)
+const showDividends = ref(false)
+const dividends = ref<ReceivedDividend[]>([])
+const dividendsSummary = ref<DividendsSummary | null>(null)
+const loadingDividends = ref(false)
 
 // Formatters
 const formatCurrency = (value: number | null) => {
@@ -84,6 +91,55 @@ const deleteTransaction = async (id: number) => {
   if (confirm(t('portfolio.confirmDeleteTransaction'))) {
     await store.deleteTransaction(id)
   }
+}
+
+// Dividends functions
+const fetchDividends = async () => {
+  loadingDividends.value = true
+  try {
+    const [listRes, summaryRes] = await Promise.all([
+      dividendsApi.list(50),
+      dividendsApi.getSummary(),
+    ])
+    dividends.value = listRes.data
+    dividendsSummary.value = summaryRes.data
+  } catch (e) {
+    console.error('Erro ao carregar dividendos:', e)
+  } finally {
+    loadingDividends.value = false
+  }
+}
+
+const toggleDividends = () => {
+  showDividends.value = !showDividends.value
+  if (showDividends.value && dividends.value.length === 0) {
+    fetchDividends()
+  }
+}
+
+const handleDividendAdded = async () => {
+  showAddDividendModal.value = false
+  await fetchDividends()
+}
+
+const deleteDividend = async (id: number) => {
+  if (confirm(t('dividends.confirmDelete'))) {
+    try {
+      await dividendsApi.delete(id)
+      await fetchDividends()
+    } catch (e) {
+      console.error('Erro ao deletar dividendo:', e)
+    }
+  }
+}
+
+const typeLabel = (type: string) => {
+  const labels: Record<string, string> = {
+    dividendo: 'Dividendo',
+    jcp: 'JCP',
+    bonificacao: 'Bonificação',
+  }
+  return labels[type] || type
 }
 </script>
 
@@ -434,6 +490,125 @@ const deleteTransaction = async (id: number) => {
         </div>
       </div>
 
+      <!-- Dividends Section -->
+      <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 overflow-hidden mb-6">
+        <button
+          @click="toggleDividends"
+          class="w-full p-4 flex items-center justify-between text-left hover:bg-gray-700/30 transition-colors"
+        >
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-emerald-500/20 rounded-lg flex items-center justify-center">
+              <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-white">{{ t('dividends.title') }}</h3>
+              <p class="text-xs text-gray-400">{{ t('dividends.subtitle') }}</p>
+            </div>
+          </div>
+          <div class="flex items-center gap-3">
+            <button
+              @click.stop="showAddDividendModal = true"
+              class="text-xs px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-colors"
+            >
+              {{ t('dividends.add') }}
+            </button>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 text-gray-400 transition-transform"
+              :class="{ 'rotate-180': showDividends }"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+            </svg>
+          </div>
+        </button>
+
+        <div v-if="showDividends" class="border-t border-gray-700/50">
+          <div v-if="loadingDividends" class="text-center py-8 text-gray-400">
+            <svg class="animate-spin h-6 w-6 mx-auto mb-2 text-emerald-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            {{ t('dividends.loading') }}
+          </div>
+
+          <template v-else>
+            <div v-if="dividendsSummary && dividendsSummary.total_count > 0" class="p-4 border-b border-gray-700/50">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-900/50 rounded-lg p-3 text-center">
+                  <p class="text-xs text-gray-400 mb-1">{{ t('dividends.totalReceived') }}</p>
+                  <p class="text-lg font-bold text-emerald-400">{{ formatCurrency(dividendsSummary.total_amount) }}</p>
+                </div>
+                <div class="bg-gray-900/50 rounded-lg p-3 text-center">
+                  <p class="text-xs text-gray-400 mb-1">{{ t('dividends.payments') }}</p>
+                  <p class="text-lg font-bold text-white">{{ dividendsSummary.total_count }}</p>
+                </div>
+                <div v-if="dividendsSummary.by_type.dividendo" class="bg-gray-900/50 rounded-lg p-3 text-center">
+                  <p class="text-xs text-gray-400 mb-1">Dividendos</p>
+                  <p class="text-lg font-bold text-white">{{ formatCurrency(dividendsSummary.by_type.dividendo) }}</p>
+                </div>
+                <div v-if="dividendsSummary.by_type.jcp" class="bg-gray-900/50 rounded-lg p-3 text-center">
+                  <p class="text-xs text-gray-400 mb-1">JCP</p>
+                  <p class="text-lg font-bold text-white">{{ formatCurrency(dividendsSummary.by_type.jcp) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="dividends.length === 0" class="text-center py-8 text-gray-400">
+              {{ t('dividends.noDividends') }}
+            </div>
+
+            <div v-else class="overflow-x-auto">
+              <table class="w-full">
+                <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase">
+                  <tr>
+                    <th class="px-4 py-3 text-left">{{ t('dividends.paymentDate') }}</th>
+                    <th class="px-4 py-3 text-left">{{ t('dividends.asset') }}</th>
+                    <th class="px-4 py-3 text-left">{{ t('dividends.type') }}</th>
+                    <th class="px-4 py-3 text-right">{{ t('dividends.shares') }}</th>
+                    <th class="px-4 py-3 text-right hidden sm:table-cell">{{ t('dividends.perShare') }}</th>
+                    <th class="px-4 py-3 text-right">{{ t('dividends.total') }}</th>
+                    <th class="px-4 py-3 text-right w-10"></th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700/50">
+                  <tr
+                    v-for="div in dividends"
+                    :key="div.id"
+                    class="hover:bg-gray-700/30 transition-colors"
+                  >
+                    <td class="px-4 py-3 text-gray-300">{{ formatDate(div.payment_date) }}</td>
+                    <td class="px-4 py-3 text-white font-medium">{{ div.ticker }}</td>
+                    <td class="px-4 py-3">
+                      <span class="text-xs px-2 py-1 rounded font-medium bg-emerald-500/20 text-emerald-400">
+                        {{ typeLabel(div.type) }}
+                      </span>
+                    </td>
+                    <td class="px-4 py-3 text-right text-white">{{ formatQuantity(div.shares) }}</td>
+                    <td class="px-4 py-3 text-right text-gray-300 hidden sm:table-cell">{{ formatCurrency(div.per_share) }}</td>
+                    <td class="px-4 py-3 text-right text-emerald-400 font-medium">{{ formatCurrency(div.amount) }}</td>
+                    <td class="px-4 py-3 text-right">
+                      <button
+                        @click.stop="deleteDividend(div.id)"
+                        class="p-2 text-gray-500 hover:text-red-400 transition-colors"
+                        :title="t('dividends.remove')"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                          <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </template>
+        </div>
+      </div>
+
       <!-- Transactions Section -->
       <div class="bg-gray-800/50 rounded-xl border border-gray-700/50 overflow-hidden">
         <button
@@ -529,6 +704,13 @@ const deleteTransaction = async (id: number) => {
       v-if="showImportModal"
       @close="showImportModal = false"
       @imported="handleImportCompleted"
+    />
+
+    <!-- Add Dividend Modal -->
+    <AddDividendModal
+      v-if="showAddDividendModal"
+      @close="showAddDividendModal = false"
+      @added="handleDividendAdded"
     />
   </div>
 </template>

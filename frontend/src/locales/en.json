@@ -291,5 +291,31 @@
     "testing": "Sending...",
     "testSent": "Notification sent! Check your device.",
     "testFailed": "Failed to send. Check permissions."
+  },
+  "dividends": {
+    "title": "Received Dividends",
+    "subtitle": "Track dividends you received",
+    "add": "+ Register",
+    "addTitle": "Register Dividend",
+    "type": "Type",
+    "asset": "Asset",
+    "assetPlaceholder": "Ex: AAPL",
+    "totalAmount": "Total Amount",
+    "shares": "Shares",
+    "perShare": "Per Share",
+    "paymentDate": "Payment Date",
+    "exDateOptional": "Ex-Date (optional)",
+    "notesOptional": "Notes (optional)",
+    "notesPlaceholder": "Notes about this dividend",
+    "register": "Register",
+    "saving": "Saving...",
+    "errorRegistering": "Error registering dividend",
+    "loading": "Loading dividends...",
+    "noDividends": "No dividends registered",
+    "totalReceived": "Total Received",
+    "payments": "Payments",
+    "total": "Total",
+    "remove": "Remove dividend",
+    "confirmDelete": "Are you sure you want to remove this dividend record?"
   }
 }

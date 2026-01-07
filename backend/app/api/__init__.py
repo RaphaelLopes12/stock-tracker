@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.alerts import router as alerts_router
+from app.api.dividends import router as dividends_router
 from app.api.fundamentals import router as fundamentals_router
 from app.api.health import router as health_router
 from app.api.news import router as news_router
@@ -19,3 +20,4 @@ api_router.include_router(news_router)
 api_router.include_router(alerts_router)
 api_router.include_router(portfolio_router)
 api_router.include_router(notifications_router)
+api_router.include_router(dividends_router)

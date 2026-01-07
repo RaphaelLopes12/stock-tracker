@@ -291,5 +291,31 @@
     "testing": "Enviando...",
     "testSent": "Notificacion enviada! Verifica tu dispositivo.",
     "testFailed": "Error al enviar. Verifica los permisos."
+  },
+  "dividends": {
+    "title": "Dividendos Recibidos",
+    "subtitle": "Acompaña los dividendos que recibiste",
+    "add": "+ Registrar",
+    "addTitle": "Registrar Dividendo",
+    "type": "Tipo",
+    "asset": "Activo",
+    "assetPlaceholder": "Ej: AAPL",
+    "totalAmount": "Monto Total",
+    "shares": "Cant Acciones",
+    "perShare": "Por Acción",
+    "paymentDate": "Fecha Pago",
+    "exDateOptional": "Fecha-ex (opcional)",
+    "notesOptional": "Notas (opcional)",
+    "notesPlaceholder": "Notas sobre este dividendo",
+    "register": "Registrar",
+    "saving": "Guardando...",
+    "errorRegistering": "Error al registrar dividendo",
+    "loading": "Cargando dividendos...",
+    "noDividends": "Ningún dividendo registrado",
+    "totalReceived": "Total Recibido",
+    "payments": "Pagos",
+    "total": "Total",
+    "remove": "Eliminar dividendo",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este registro de dividendo?"
   }
 }
