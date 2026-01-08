@@ -14,8 +14,49 @@ from app.schemas.received_dividend import (
     ReceivedDividendCreate,
     ReceivedDividendResponse,
 )
+from app.services.dividend_service import (
+    get_dividends_calendar,
+    format_upcoming_dividends,
+)
 
 router = APIRouter(prefix="/dividends", tags=["dividends"])
+
+
+@router.get("/calendar")
+async def get_calendar(
+    db: AsyncSession = Depends(get_db),
+):
+    """Busca agenda de dividendos das ações monitoradas."""
+    result = await db.execute(
+        select(Stock).where(Stock.is_active == True).order_by(Stock.ticker)
+    )
+    stocks = result.scalars().all()
+
+    if not stocks:
+        return {"upcoming": [], "by_stock": []}
+
+    tickers = [s.ticker for s in stocks]
+    stock_map = {s.ticker: {"id": s.id, "name": s.name} for s in stocks}
+
+    dividend_data = await get_dividends_calendar(tickers)
+
+    for item in dividend_data:
+        ticker = item.get("ticker")
+        if ticker in stock_map:
+            item["stock_id"] = stock_map[ticker]["id"]
+            item["stock_name"] = stock_map[ticker].get("name") or item.get("name")
+
+    upcoming = format_upcoming_dividends(dividend_data)
+
+    for item in upcoming:
+        ticker = item.get("ticker")
+        if ticker in stock_map:
+            item["stock_id"] = stock_map[ticker]["id"]
+
+    return {
+        "upcoming": upcoming,
+        "by_stock": dividend_data,
+    }
 
 
 @router.get("", response_model=list[ReceivedDividendResponse])

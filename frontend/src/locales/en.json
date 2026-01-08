@@ -25,6 +25,7 @@
     "dashboard": "Dashboard",
     "stocks": "Stocks",
     "portfolio": "Portfolio",
+    "dividends": "Dividends",
     "alerts": "Alerts"
   },
   "dashboard": {
@@ -317,5 +318,22 @@
     "total": "Total",
     "remove": "Remove dividend",
     "confirmDelete": "Are you sure you want to remove this dividend record?"
+  },
+  "dividendCalendar": {
+    "title": "Dividend Calendar",
+    "subtitle": "Upcoming dividends from monitored stocks",
+    "loading": "Loading calendar...",
+    "errorLoading": "Error loading dividend calendar",
+    "upcoming": "Upcoming Dividends",
+    "recent": "Recent Dividends",
+    "topDividendYield": "Top Dividend Yield",
+    "topDividendYieldDesc": "Monitored stocks with highest dividend returns",
+    "exDate": "Ex-Date",
+    "paymentDate": "Payment",
+    "share": "share",
+    "noData": "No stocks with dividend data",
+    "noName": "Name not available",
+    "paymentsLastYear": "payments last year",
+    "disclaimer": "Dividend data is obtained via Yahoo Finance and may be delayed. Always confirm information on the company's official website or B3."
   }
 }

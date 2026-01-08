@@ -317,4 +317,39 @@ export const dividendsApi = {
   create: (data: ReceivedDividendCreate) => api.post<ReceivedDividend>('/dividends', data),
   delete: (id: number) => api.delete(`/dividends/${id}`),
   getSummary: (year?: number) => api.get<DividendsSummary>('/dividends/summary', { params: { year } }),
+  getCalendar: () => api.get<DividendCalendarResponse>('/dividends/calendar'),
+}
+
+export interface DividendCalendarItem {
+  ticker: string
+  name: string | null
+  ex_date: string
+  dividend_yield: number | null
+  dividend_rate: number | null
+  value_per_share?: number
+  type: 'upcoming' | 'recent'
+  stock_id?: number
+}
+
+export interface DividendStockInfo {
+  ticker: string
+  name: string | null
+  stock_id?: number
+  stock_name?: string
+  dividend_yield: number | null
+  dividend_rate: number | null
+  ex_dividend_date: number | null
+  calendar: {
+    ex_date: string | null
+    dividend_date: string | null
+  } | null
+  history: {
+    date: string
+    value: number
+  }[]
+}
+
+export interface DividendCalendarResponse {
+  upcoming: DividendCalendarItem[]
+  by_stock: DividendStockInfo[]
 }

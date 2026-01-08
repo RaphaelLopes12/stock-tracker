@@ -28,6 +28,11 @@ const router = createRouter({
       name: 'alerts',
       component: () => import('@/views/Alerts.vue'),
     },
+    {
+      path: '/dividends',
+      name: 'dividends',
+      component: () => import('@/views/DividendCalendar.vue'),
+    },
   ],
 })
 

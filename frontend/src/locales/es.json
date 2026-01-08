@@ -25,6 +25,7 @@
     "dashboard": "Panel",
     "stocks": "Acciones",
     "portfolio": "Cartera",
+    "dividends": "Dividendos",
     "alerts": "Alertas"
   },
   "dashboard": {
@@ -317,5 +318,22 @@
     "total": "Total",
     "remove": "Eliminar dividendo",
     "confirmDelete": "¿Estás seguro de que deseas eliminar este registro de dividendo?"
+  },
+  "dividendCalendar": {
+    "title": "Agenda de Dividendos",
+    "subtitle": "Próximos dividendos de las acciones monitoreadas",
+    "loading": "Cargando agenda...",
+    "errorLoading": "Error al cargar agenda de dividendos",
+    "upcoming": "Próximos Dividendos",
+    "recent": "Dividendos Recientes",
+    "topDividendYield": "Mayores Dividend Yield",
+    "topDividendYieldDesc": "Acciones monitoreadas con mayor retorno en dividendos",
+    "exDate": "Fecha-ex",
+    "paymentDate": "Pago",
+    "share": "acción",
+    "noData": "Ninguna acción con datos de dividendos",
+    "noName": "Nombre no disponible",
+    "paymentsLastYear": "pagos en el último año",
+    "disclaimer": "Los datos de dividendos se obtienen via Yahoo Finance y pueden presentar retraso. Siempre confirma las informaciones en el sitio oficial de la empresa o de B3."
   }
 }
